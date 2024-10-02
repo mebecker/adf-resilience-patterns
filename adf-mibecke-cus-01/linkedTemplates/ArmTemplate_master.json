@@ -21,6 +21,30 @@
 				"syn-mibecke-cus-01.sql.azuresynapse.net"
 			]
 		},
+		"default_properties_primaryWorkspaceUrl_value": {
+			"type": "string",
+			"defaultValue": "https://adb-3001519857218975.15.azuredatabricks.net"
+		},
+		"default_properties_failoverWorkspaceUrl_value": {
+			"type": "string",
+			"defaultValue": "https://adb-1386680983746450.10.azuredatabricks.net/"
+		},
+		"default_properties_primaryWorkspaceResourceId_value": {
+			"type": "string",
+			"defaultValue": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01"
+		},
+		"default_properties_failoverWorkspaceResourceId_value": {
+			"type": "string",
+			"defaultValue": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-eus2-01"
+		},
+		"default_properties_primaryInstancePoolId_value": {
+			"type": "string",
+			"defaultValue": "0923-201003-yarn12-pool-n1bcdevw"
+		},
+		"default_properties_failoverInstancePoolId_value": {
+			"type": "string",
+			"defaultValue": "0923-200944-gym276-pool-ezzwvw1s"
+		},
 		"containerUri": {
 			"type": "string",
 			"metadata": "URI to storage account containing linked ARM templates"
@@ -47,6 +71,24 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"default_properties_primaryWorkspaceUrl_value": {
+						"value": "[parameters('default_properties_primaryWorkspaceUrl_value')]"
+					},
+					"default_properties_failoverWorkspaceUrl_value": {
+						"value": "[parameters('default_properties_failoverWorkspaceUrl_value')]"
+					},
+					"default_properties_primaryWorkspaceResourceId_value": {
+						"value": "[parameters('default_properties_primaryWorkspaceResourceId_value')]"
+					},
+					"default_properties_failoverWorkspaceResourceId_value": {
+						"value": "[parameters('default_properties_failoverWorkspaceResourceId_value')]"
+					},
+					"default_properties_primaryInstancePoolId_value": {
+						"value": "[parameters('default_properties_primaryInstancePoolId_value')]"
+					},
+					"default_properties_failoverInstancePoolId_value": {
+						"value": "[parameters('default_properties_failoverInstancePoolId_value')]"
 					},
 					"AzureSynapseAnalytics432_properties_privateLinkResourceId": {
 						"value": "[parameters('AzureSynapseAnalytics432_properties_privateLinkResourceId')]"
