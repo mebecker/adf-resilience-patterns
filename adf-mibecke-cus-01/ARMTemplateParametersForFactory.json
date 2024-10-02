@@ -1,0 +1,20 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-mibecke-cus-01"
+		},
+		"AzureSynapseAnalytics432_properties_privateLinkResourceId": {
+			"value": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-synapse/providers/Microsoft.Synapse/workspaces/syn-mibecke-cus-01"
+		},
+		"AzureSynapseAnalytics432_properties_groupId": {
+			"value": "sql"
+		},
+		"AzureSynapseAnalytics432_properties_fqdns": {
+			"value": [
+				"syn-mibecke-cus-01.sql.azuresynapse.net"
+			]
+		}
+	}
+}

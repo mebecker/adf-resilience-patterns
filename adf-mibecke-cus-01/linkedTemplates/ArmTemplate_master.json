@@ -1,0 +1,65 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-mibecke-cus-01"
+		},
+		"AzureSynapseAnalytics432_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-synapse/providers/Microsoft.Synapse/workspaces/syn-mibecke-cus-01"
+		},
+		"AzureSynapseAnalytics432_properties_groupId": {
+			"type": "string",
+			"defaultValue": "sql"
+		},
+		"AzureSynapseAnalytics432_properties_fqdns": {
+			"type": "array",
+			"defaultValue": [
+				"syn-mibecke-cus-01.sql.azuresynapse.net"
+			]
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adf-mibecke-cus-01_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AzureSynapseAnalytics432_properties_privateLinkResourceId": {
+						"value": "[parameters('AzureSynapseAnalytics432_properties_privateLinkResourceId')]"
+					},
+					"AzureSynapseAnalytics432_properties_groupId": {
+						"value": "[parameters('AzureSynapseAnalytics432_properties_groupId')]"
+					},
+					"AzureSynapseAnalytics432_properties_fqdns": {
+						"value": "[parameters('AzureSynapseAnalytics432_properties_fqdns')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}
