@@ -21,6 +21,10 @@
 			"primaryInstancePoolId": {
 				"type": "string",
 				"value": "0923-201003-yarn12-pool-n1bcdevw"
+			},
+			"failoverInstancePoolId": {
+				"type": "string",
+				"value": "0923-200944-gym276-pool-ezzwvw1s"
 			}
 		}
 	},
