@@ -1,0 +1,245 @@
+{
+	"name": "RetryOnCapacityFailure",
+	"properties": {
+		"activities": [
+			{
+				"name": "Loop Until Capacity Available",
+				"type": "Until",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@or(greater(int(variables('iterationCount')), pipeline().parameters.maxIterations), variables('exitLoop'))",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Run Notebook",
+							"type": "DatabricksNotebook",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"notebookPath": {
+									"value": "@pipeline().parameters.notebookPath",
+									"type": "Expression"
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "AzureDatabricks1",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "set exitLoop true",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Run Notebook",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "exitLoop",
+								"value": true
+							}
+						},
+						{
+							"name": "Check if failure capacity related",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Run Notebook",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@or(greater(indexOf(activity('Run Notebook').output.runError, 'INSTANCE_POOL_MAX_CAPACITY_REACHED'), 0) ,greater(indexOf(activity('Run Notebook').output.runError, 'SOME_OTHER_ERROR_STRING'), 0) )",
+									"type": "Expression"
+								},
+								"ifFalseActivities": [
+									{
+										"name": "set exitLoop true 2",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "exitLoop",
+											"value": true
+										}
+									}
+								],
+								"ifTrueActivities": [
+									{
+										"name": "set exitLoop false",
+										"type": "SetVariable",
+										"dependsOn": [
+											{
+												"activity": "increment iteration count",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "exitLoop",
+											"value": false
+										}
+									},
+									{
+										"name": "wait",
+										"type": "Wait",
+										"dependsOn": [
+											{
+												"activity": "set exitLoop false",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"userProperties": [],
+										"typeProperties": {
+											"waitTimeInSeconds": {
+												"value": "@pipeline().parameters.retryIntervalSeconds",
+												"type": "Expression"
+											}
+										}
+									},
+									{
+										"name": "increment iterationCountInternal",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "iterationCountInternal",
+											"value": {
+												"value": "@string(add(int(variables('iterationCount')),1))",
+												"type": "Expression"
+											}
+										}
+									},
+									{
+										"name": "increment iteration count",
+										"type": "SetVariable",
+										"dependsOn": [
+											{
+												"activity": "increment iterationCountInternal",
+												"dependencyConditions": [
+													"Succeeded"
+												]
+											}
+										],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "iterationCount",
+											"value": {
+												"value": "@variables('iterationCountInternal')",
+												"type": "Expression"
+											}
+										}
+									}
+								]
+							}
+						},
+						{
+							"name": "Fail if max iteration count exceeded",
+							"type": "IfCondition",
+							"dependsOn": [
+								{
+									"activity": "Run Notebook",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@greater(int(variables('iterationCount')), pipeline().parameters.maxIterations)",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Fail1",
+										"type": "Fail",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"message": "Max iterations exceeded",
+											"errorCode": "666"
+										}
+									}
+								]
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"maxIterations": {
+				"type": "int",
+				"defaultValue": 10
+			},
+			"notebookPath": {
+				"type": "string"
+			},
+			"retryIntervalSeconds": {
+				"type": "int",
+				"defaultValue": 300
+			}
+		},
+		"variables": {
+			"exitLoop": {
+				"type": "Boolean",
+				"defaultValue": false
+			},
+			"iterationCount": {
+				"type": "String",
+				"defaultValue": "1"
+			},
+			"iterationCountInternal": {
+				"type": "String",
+				"defaultValue": "1"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2024-09-26T16:52:12Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

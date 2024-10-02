@@ -1,0 +1,30 @@
+{
+	"name": "pipeline1",
+	"properties": {
+		"activities": [
+			{
+				"name": "FaultTolerantDatabricksNotebook",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "RetryOnCapacityFailure",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
+						"retryIntervalSeconds": 120
+					}
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2024-09-23T21:00:09Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
