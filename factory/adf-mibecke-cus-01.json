@@ -1,5 +1,13 @@
 {
 	"name": "adf-mibecke-cus-01",
+	"properties": {
+		"globalParameters": {
+			"primaryWorkspaceUrl": {
+				"type": "string",
+				"value": "https://adb-3001519857218975.15.azuredatabricks.net"
+			}
+		}
+	},
 	"location": "centralus",
 	"identity": {
 		"type": "SystemAssigned",
