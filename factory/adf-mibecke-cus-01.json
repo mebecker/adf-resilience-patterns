@@ -17,6 +17,10 @@
 			"failoverWorkspaceResourceId": {
 				"type": "string",
 				"value": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-eus2-01"
+			},
+			"primaryInstancePoolId": {
+				"type": "string",
+				"value": "0923-201003-yarn12-pool-n1bcdevw"
 			}
 		}
 	},
