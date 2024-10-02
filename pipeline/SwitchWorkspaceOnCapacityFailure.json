@@ -409,28 +409,22 @@
 				"defaultValue": 300
 			},
 			"activeWorkspaceUrl": {
-				"type": "string",
-				"defaultValue": "https://adb-1120462673099188.8.azuredatabricks.net/"
+				"type": "string"
 			},
 			"activeInstancePoolId": {
-				"type": "string",
-				"defaultValue": "0911-204757-lorn9-pool-i4ikpkzw"
+				"type": "string"
 			},
 			"failoverWorkpaceUrl": {
-				"type": "string",
-				"defaultValue": "https://adb-304354300915194.14.azuredatabricks.net/"
+				"type": "string"
 			},
 			"failoverInstancePoolId": {
-				"type": "string",
-				"defaultValue": "0923-143337-mows8-pool-goxh89ss"
+				"type": "string"
 			},
 			"activeWorkspaceResourceId": {
-				"type": "string",
-				"defaultValue": "/subscriptions/6704b7a1-f4ba-4f2c-8c3e-e5bf412fa640/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01"
+				"type": "string"
 			},
 			"failoverWorkspaceResourceId": {
-				"type": "string",
-				"defaultValue": "/subscriptions/6704b7a1-f4ba-4f2c-8c3e-e5bf412fa640/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-03"
+				"type": "string"
 			}
 		},
 		"variables": {

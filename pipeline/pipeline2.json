@@ -18,12 +18,30 @@
 					"waitOnCompletion": true,
 					"parameters": {
 						"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
-						"activeWorkspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net",
-						"activeInstancePoolId": "0923-201003-yarn12-pool-n1bcdevw",
-						"failoverWorkpaceUrl": "https://adb-1386680983746450.10.azuredatabricks.net/",
-						"failoverInstancePoolId": "0923-200944-gym276-pool-ezzwvw1s",
-						"activeWorkspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
-						"failoverWorkspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-eus2-01"
+						"activeWorkspaceUrl": {
+							"value": "@pipeline().globalParameters.primaryWorkspaceUrl",
+							"type": "Expression"
+						},
+						"activeInstancePoolId": {
+							"value": "@pipeline().globalParameters.primaryInstancePoolId",
+							"type": "Expression"
+						},
+						"failoverWorkpaceUrl": {
+							"value": "@pipeline().globalParameters.failoverWorkspaceUrl",
+							"type": "Expression"
+						},
+						"failoverInstancePoolId": {
+							"value": "@pipeline().globalParameters.failoverInstancePoolId",
+							"type": "Expression"
+						},
+						"activeWorkspaceResourceId": {
+							"value": "@pipeline().globalParameters.primaryWorkspaceResourceId",
+							"type": "Expression"
+						},
+						"failoverWorkspaceResourceId": {
+							"value": "@pipeline().globalParameters.failoverWorkspaceResourceId",
+							"type": "Expression"
+						}
 					}
 				}
 			}
