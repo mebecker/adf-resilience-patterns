@@ -694,28 +694,22 @@
 						"defaultValue": 300
 					},
 					"activeWorkspaceUrl": {
-						"type": "string",
-						"defaultValue": "https://adb-1120462673099188.8.azuredatabricks.net/"
+						"type": "string"
 					},
 					"activeInstancePoolId": {
-						"type": "string",
-						"defaultValue": "0911-204757-lorn9-pool-i4ikpkzw"
+						"type": "string"
 					},
 					"failoverWorkpaceUrl": {
-						"type": "string",
-						"defaultValue": "https://adb-304354300915194.14.azuredatabricks.net/"
+						"type": "string"
 					},
 					"failoverInstancePoolId": {
-						"type": "string",
-						"defaultValue": "0923-143337-mows8-pool-goxh89ss"
+						"type": "string"
 					},
 					"activeWorkspaceResourceId": {
-						"type": "string",
-						"defaultValue": "/subscriptions/6704b7a1-f4ba-4f2c-8c3e-e5bf412fa640/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01"
+						"type": "string"
 					},
 					"failoverWorkspaceResourceId": {
-						"type": "string",
-						"defaultValue": "/subscriptions/6704b7a1-f4ba-4f2c-8c3e-e5bf412fa640/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-03"
+						"type": "string"
 					}
 				},
 				"variables": {
@@ -820,12 +814,30 @@
 							"waitOnCompletion": true,
 							"parameters": {
 								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
-								"activeWorkspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net",
-								"activeInstancePoolId": "0923-201003-yarn12-pool-n1bcdevw",
-								"failoverWorkpaceUrl": "https://adb-1386680983746450.10.azuredatabricks.net/",
-								"failoverInstancePoolId": "0923-200944-gym276-pool-ezzwvw1s",
-								"activeWorkspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
-								"failoverWorkspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-eus2-01"
+								"activeWorkspaceUrl": {
+									"value": "@pipeline().globalParameters.primaryWorkspaceUrl",
+									"type": "Expression"
+								},
+								"activeInstancePoolId": {
+									"value": "@pipeline().globalParameters.primaryInstancePoolId",
+									"type": "Expression"
+								},
+								"failoverWorkpaceUrl": {
+									"value": "@pipeline().globalParameters.failoverWorkspaceUrl",
+									"type": "Expression"
+								},
+								"failoverInstancePoolId": {
+									"value": "@pipeline().globalParameters.failoverInstancePoolId",
+									"type": "Expression"
+								},
+								"activeWorkspaceResourceId": {
+									"value": "@pipeline().globalParameters.primaryWorkspaceResourceId",
+									"type": "Expression"
+								},
+								"failoverWorkspaceResourceId": {
+									"value": "@pipeline().globalParameters.failoverWorkspaceResourceId",
+									"type": "Expression"
+								}
 							}
 						}
 					}
