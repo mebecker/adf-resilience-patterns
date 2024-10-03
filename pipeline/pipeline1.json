@@ -17,6 +17,7 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
+						"maxIterations": 2,
 						"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
 						"retryIntervalSeconds": 120
 					}
