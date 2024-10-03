@@ -87,7 +87,12 @@
 									},
 									"linkedServiceName": {
 										"referenceName": "AzureDatabricks1",
-										"type": "LinkedServiceReference"
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
+											"instancePoolId": "0923-201003-yarn12-pool-n1bcdevw",
+											"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01"
+										}
 									}
 								},
 								{
