@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "getToken",
+				"name": "sql statements api_copy1",
 				"type": "WebActivity",
 				"dependsOn": [],
 				"policy": {
@@ -15,13 +15,19 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"method": "GET",
-					"url": "https://adb-1386680983746450.10.azuredatabricks.net/api/2.0/sql/statements/01ef8bf5-fcf8-175b-a349-a985f60e42a9",
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json"
+					},
+					"url": "https://adb-1386680983746450.10.azuredatabricks.net/api/2.0/sql/statements",
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
 					},
-					"body": "1",
+					"body": {
+						"statement": "REPAIR TABLE samibeckecus02.default.data3 SYNC METADATA",
+						"warehouse_id": "3fe3ae28df670188"
+					},
 					"authentication": {
 						"type": "MSI",
 						"resource": "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
