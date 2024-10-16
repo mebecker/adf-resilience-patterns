@@ -15,12 +15,13 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"method": "POST",
-					"url": "https://login.microsoftonline.com/tenantid/oauth2/v2.0/token",
+					"method": "GET",
+					"url": "https://adb-1386680983746450.10.azuredatabricks.net/api/2.0/sql/statements/01ef8bf5-fcf8-175b-a349-a985f60e42a9",
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
 					},
+					"body": "1",
 					"authentication": {
 						"type": "MSI",
 						"resource": "2ff814a6-3304-4ab8-85cb-cd0e6f879c1d"
