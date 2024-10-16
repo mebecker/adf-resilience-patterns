@@ -997,7 +997,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "sql statements api_copy1",
+						"name": "REPAIR TABLE",
 						"type": "WebActivity",
 						"dependsOn": [],
 						"policy": {
