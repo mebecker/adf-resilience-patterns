@@ -1,0 +1,29 @@
+{
+	"name": "pipeline4",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "RepairTable",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"workspaceUrl": "https://adb-1386680983746450.10.azuredatabricks.net/api/2.0/sql/statements",
+						"tableName": "samibeckecus02.default.data3",
+						"warehouseId": "3fe3ae28df670188"
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
