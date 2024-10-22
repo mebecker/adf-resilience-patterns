@@ -20,7 +20,7 @@
 						"Content-Type": "application/json"
 					},
 					"url": {
-						"value": "\"@{pipeline().parameters.workspaceUrl}/api/2.0/sql/statements\"",
+						"value": "@{pipeline().parameters.workspaceUrl}/api/2.0/sql/statements",
 						"type": "Expression"
 					},
 					"connectVia": {
