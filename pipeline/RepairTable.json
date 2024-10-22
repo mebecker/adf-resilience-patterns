@@ -28,7 +28,7 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"body": {
-						"value": "{'statement':'REPAIR TABLE @{pipeline().parameters.tableName} SYNC METADATA','warehouse_id':@{pipeline().parameters.warehouseId}}",
+						"value": "{'statement':'REPAIR TABLE @{pipeline().parameters.tableName} SYNC METADATA','warehouse_id': '@{pipeline().parameters.warehouseId}'}",
 						"type": "Expression"
 					},
 					"authentication": {
