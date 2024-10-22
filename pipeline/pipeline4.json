@@ -17,7 +17,7 @@
 					},
 					"waitOnCompletion": true,
 					"parameters": {
-						"workspaceUrl": "https://adb-1386680983746450.10.azuredatabricks.net/api/2.0/sql/statements",
+						"workspaceUrl": "https://adb-1386680983746450.10.azuredatabricks.net",
 						"tableName": "samibeckecus02.default.data3",
 						"warehouseId": "3fe3ae28df670188"
 					}
