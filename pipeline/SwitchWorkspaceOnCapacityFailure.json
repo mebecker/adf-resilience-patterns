@@ -70,7 +70,21 @@
 							},
 							"linkedServiceName": {
 								"referenceName": "AzureDatabricks1",
-								"type": "LinkedServiceReference"
+								"type": "LinkedServiceReference",
+								"parameters": {
+									"workspaceUrl": {
+										"value": "@variables('activeWorkspaceUrl')",
+										"type": "Expression"
+									},
+									"instancePoolId": {
+										"value": "@variables('activeInstancePoolId')",
+										"type": "Expression"
+									},
+									"workspaceResourceId": {
+										"value": "@variables('activeWorkspaceResourceId')",
+										"type": "Expression"
+									}
+								}
 							}
 						},
 						{
