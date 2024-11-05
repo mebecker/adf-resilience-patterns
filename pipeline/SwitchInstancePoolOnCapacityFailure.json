@@ -61,7 +61,11 @@
 							"name": "Fail1",
 							"type": "Fail",
 							"dependsOn": [],
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"message": "ERROR_NOT_CAPACITY_RELATED",
+								"errorCode": "123"
+							}
 						}
 					],
 					"ifTrueActivities": [
