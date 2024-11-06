@@ -400,22 +400,8 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "AzureDatabricks1",
-							"type": "LinkedServiceReference",
-							"parameters": {
-								"workspaceUrl": {
-									"value": "@pipeline().parameters.workspaceUrl",
-									"type": "Expression"
-								},
-								"instancePoolId": {
-									"value": "@pipeline().parameters.initialInstancePoolId",
-									"type": "Expression"
-								},
-								"workspaceResourceId": {
-									"value": "@pipeline().parameters.workspaceResourceId",
-									"type": "Expression"
-								}
-							}
+							"referenceName": "AzureDatabricks2",
+							"type": "LinkedServiceReference"
 						}
 					},
 					{
@@ -552,6 +538,7 @@
 				"lastPublishTime": "2024-09-26T16:52:12Z"
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks2')]",
 				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
 			]
 		},
@@ -1316,6 +1303,32 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricks2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-3001519857218975.15.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
+					"newClusterNodeType": "Standard_E80ids_v4",
+					"newClusterNumOfWorker": "1",
+					"newClusterVersion": "15.4.x-scala2.12",
+					"clusterOption": "Fixed",
+					"newClusterInitScripts": []
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AutoResolveIntegrationRuntime')]",

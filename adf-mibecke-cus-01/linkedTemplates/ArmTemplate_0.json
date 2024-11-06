@@ -381,186 +381,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/SwitchInstancePoolOnCapacityFailure')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Run Notebook 1",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@pipeline().parameters.notebookPath",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "AzureDatabricks1",
-							"type": "LinkedServiceReference",
-							"parameters": {
-								"workspaceUrl": {
-									"value": "@pipeline().parameters.workspaceUrl",
-									"type": "Expression"
-								},
-								"instancePoolId": {
-									"value": "@pipeline().parameters.initialInstancePoolId",
-									"type": "Expression"
-								},
-								"workspaceResourceId": {
-									"value": "@pipeline().parameters.workspaceResourceId",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
-						"name": "Check if failure capacity related",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "Run Notebook 1",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@or(greater(indexOf(activity('Run Notebook 1').output.runError, 'INSTANCE_POOL_MAX_CAPACITY_REACHED'), 0) ,greater(indexOf(activity('Run Notebook 1').output.runError, 'SOME_OTHER_ERROR_STRING'), 0) )",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "Fail1",
-									"type": "Fail",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"message": "ERROR_NOT_CAPACITY_RELATED",
-										"errorCode": "123"
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "Run Notebook 2",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@pipeline().parameters.notebookPath",
-											"type": "Expression"
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "AzureDatabricks1",
-										"type": "LinkedServiceReference",
-										"parameters": {
-											"workspaceUrl": {
-												"value": "@pipeline().parameters.workspaceUrl",
-												"type": "Expression"
-											},
-											"instancePoolId": {
-												"value": "@pipeline().parameters.failoverInstancePoolId",
-												"type": "Expression"
-											},
-											"workspaceResourceId": {
-												"value": "@pipeline().parameters.workspaceResourceId",
-												"type": "Expression"
-											}
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"notebookPath": {
-						"type": "string"
-					},
-					"workspaceUrl": {
-						"type": "string"
-					},
-					"initialInstancePoolId": {
-						"type": "string"
-					},
-					"failoverInstancePoolId": {
-						"type": "string"
-					},
-					"workspaceResourceId": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"exitLoop": {
-						"type": "Boolean",
-						"defaultValue": false
-					},
-					"iterationCount": {
-						"type": "String",
-						"defaultValue": "1"
-					},
-					"iterationCountInternal": {
-						"type": "String",
-						"defaultValue": "1"
-					},
-					"activeWorkspaceUrl": {
-						"type": "String"
-					},
-					"activeInstancePoolId": {
-						"type": "String"
-					},
-					"failoverWorkpaceUrl": {
-						"type": "String"
-					},
-					"failoverInstancePoolId": {
-						"type": "String"
-					},
-					"activeWorkspaceResourceId": {
-						"type": "String"
-					},
-					"failoverWorkspaceResourceId": {
-						"type": "String"
-					},
-					"maxIterations": {
-						"type": "Integer",
-						"defaultValue": 2
-					}
-				},
-				"folder": {
-					"name": "ODCR Demo"
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-09-26T16:52:12Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/SwitchWorkspaceOnCapacityFailure')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1158,48 +978,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/odcrInstancePoolDemoPipeline')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Execute Pipeline1",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "SwitchInstancePoolOnCapacityFailure",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
-								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
-								"initialInstancePoolId": "1105-210710-awing2-pool-bv7hvz4s",
-								"failoverInstancePoolId": "1105-210744-foray3-pool-306c6t24",
-								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "ODCR Demo"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/SwitchInstancePoolOnCapacityFailure')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1355,6 +1133,199 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricks2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-3001519857218975.15.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
+					"newClusterNodeType": "Standard_E80ids_v4",
+					"newClusterNumOfWorker": "1",
+					"newClusterVersion": "15.4.x-scala2.12",
+					"clusterOption": "Fixed",
+					"newClusterInitScripts": []
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SwitchInstancePoolOnCapacityFailure')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Run Notebook 1",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.notebookPath",
+								"type": "Expression"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureDatabricks2",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Check if failure capacity related",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Run Notebook 1",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@or(greater(indexOf(activity('Run Notebook 1').output.runError, 'INSTANCE_POOL_MAX_CAPACITY_REACHED'), 0) ,greater(indexOf(activity('Run Notebook 1').output.runError, 'SOME_OTHER_ERROR_STRING'), 0) )",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Fail1",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": "ERROR_NOT_CAPACITY_RELATED",
+										"errorCode": "123"
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Run Notebook 2",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": {
+											"value": "@pipeline().parameters.notebookPath",
+											"type": "Expression"
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "AzureDatabricks1",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"workspaceUrl": {
+												"value": "@pipeline().parameters.workspaceUrl",
+												"type": "Expression"
+											},
+											"instancePoolId": {
+												"value": "@pipeline().parameters.failoverInstancePoolId",
+												"type": "Expression"
+											},
+											"workspaceResourceId": {
+												"value": "@pipeline().parameters.workspaceResourceId",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"notebookPath": {
+						"type": "string"
+					},
+					"workspaceUrl": {
+						"type": "string"
+					},
+					"initialInstancePoolId": {
+						"type": "string"
+					},
+					"failoverInstancePoolId": {
+						"type": "string"
+					},
+					"workspaceResourceId": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"exitLoop": {
+						"type": "Boolean",
+						"defaultValue": false
+					},
+					"iterationCount": {
+						"type": "String",
+						"defaultValue": "1"
+					},
+					"iterationCountInternal": {
+						"type": "String",
+						"defaultValue": "1"
+					},
+					"activeWorkspaceUrl": {
+						"type": "String"
+					},
+					"activeInstancePoolId": {
+						"type": "String"
+					},
+					"failoverWorkpaceUrl": {
+						"type": "String"
+					},
+					"failoverInstancePoolId": {
+						"type": "String"
+					},
+					"activeWorkspaceResourceId": {
+						"type": "String"
+					},
+					"failoverWorkspaceResourceId": {
+						"type": "String"
+					},
+					"maxIterations": {
+						"type": "Integer",
+						"defaultValue": 2
+					}
+				},
+				"folder": {
+					"name": "ODCR Demo"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-09-26T16:52:12Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks2')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDatabricks1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1392,6 +1363,48 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/RepairTable')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/odcrInstancePoolDemoPipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Execute Pipeline1",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SwitchInstancePoolOnCapacityFailure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
+								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
+								"initialInstancePoolId": "1105-210710-awing2-pool-bv7hvz4s",
+								"failoverInstancePoolId": "1105-210744-foray3-pool-306c6t24",
+								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "ODCR Demo"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SwitchInstancePoolOnCapacityFailure')]"
 			]
 		}
 	]
