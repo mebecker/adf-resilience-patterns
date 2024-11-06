@@ -40,7 +40,7 @@
 				}
 			},
 			{
-				"name": "Check if failure capacity related_copy1",
+				"name": "Check if failure capacity related",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
