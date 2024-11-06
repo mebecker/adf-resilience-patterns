@@ -1201,7 +1201,7 @@
 						"userProperties": [],
 						"typeProperties": {
 							"expression": {
-								"value": "@or(greater(indexOf(activity('Run Notebook 1').output.runError, 'INSTANCE_POOL_MAX_CAPACITY_REACHED'), 0) ,greater(indexOf(activity('Run Notebook 1').output.runError, 'SOME_OTHER_ERROR_STRING'), 0) )",
+								"value": "@or(greater(indexOf(activity('Run Notebook 1').output.runError, 'INSTANCE_POOL_MAX_CAPACITY_REACHED'), 0) ,greater(indexOf(activity('Run Notebook 1').output.runError, 'QuotaExceeded'), 0) )",
 								"type": "Expression"
 							},
 							"ifFalseActivities": [
