@@ -24,6 +24,9 @@
 				}
 			}
 		],
+		"folder": {
+			"name": "Old"
+		},
 		"annotations": []
 	}
 }
