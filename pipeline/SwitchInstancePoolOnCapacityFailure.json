@@ -21,22 +21,8 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "AzureDatabricks1",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"workspaceUrl": {
-							"value": "@pipeline().parameters.workspaceUrl",
-							"type": "Expression"
-						},
-						"instancePoolId": {
-							"value": "@pipeline().parameters.initialInstancePoolId",
-							"type": "Expression"
-						},
-						"workspaceResourceId": {
-							"value": "@pipeline().parameters.workspaceResourceId",
-							"type": "Expression"
-						}
-					}
+					"referenceName": "AzureDatabricks2",
+					"type": "LinkedServiceReference"
 				}
 			},
 			{
