@@ -382,7 +382,7 @@
 			"properties": {
 				"activities": [
 					{
-						"name": "Run Notebook 1",
+						"name": "InitialNotebookRunAttempt",
 						"type": "DatabricksNotebook",
 						"dependsOn": [],
 						"policy": {
@@ -423,7 +423,7 @@
 						"type": "ForEach",
 						"dependsOn": [
 							{
-								"activity": "Run Notebook 1",
+								"activity": "InitialNotebookRunAttempt",
 								"dependencyConditions": [
 									"Failed"
 								]
@@ -443,12 +443,12 @@
 									"userProperties": [],
 									"typeProperties": {
 										"expression": {
-											"value": "@contains(activity('Run Notebook 1').output.runError, item())",
+											"value": "@contains(activity('InitialNotebookRunAttempt').output.runError, item())",
 											"type": "Expression"
 										},
 										"ifTrueActivities": [
 											{
-												"name": "Run Notebook 2",
+												"name": "FailoverNotebookRunAttempt",
 												"type": "DatabricksNotebook",
 												"dependsOn": [],
 												"policy": {
@@ -1352,6 +1352,78 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline5')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.ErrorMessages",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@contains('this string contains foo', item())",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Set variable1",
+												"type": "SetVariable",
+												"dependsOn": [],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "FoundString",
+													"value": true
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ErrorMessages": {
+						"type": "array"
+					}
+				},
+				"variables": {
+					"ErrorMessages": {
+						"type": "Array"
+					},
+					"FoundString": {
+						"type": "Boolean"
+					},
+					"failoverConditionSatisfied": {
+						"type": "Boolean"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1452,82 +1524,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline5')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@pipeline().parameters.ErrorMessages",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "If Condition1",
-									"type": "IfCondition",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@contains('this string contains foo', item())",
-											"type": "Expression"
-										},
-										"ifTrueActivities": [
-											{
-												"name": "Set variable1",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "FoundString",
-													"value": true
-												}
-											}
-										]
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"ErrorMessages": {
-						"type": "array",
-						"defaultValue": [
-							"foo",
-							"bar"
-						]
-					}
-				},
-				"variables": {
-					"ErrorMessages": {
-						"type": "Array"
-					},
-					"FoundString": {
-						"type": "Boolean"
-					},
-					"failoverConditionSatisfied": {
-						"type": "Boolean"
-					}
-				},
-				"annotations": []
-			},
-			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default')]",
