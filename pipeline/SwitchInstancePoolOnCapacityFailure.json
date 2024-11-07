@@ -64,7 +64,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@contains(activity('Run Notebook 1').output.runError, item())",
+									"value": "@contains(activity('InitialNotebookRunAttempt').output.runError, item())",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
