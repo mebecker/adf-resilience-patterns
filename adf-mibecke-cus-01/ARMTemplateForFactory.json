@@ -1332,7 +1332,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/odcrInstancePoolDemoPipeline')]",
+			"name": "[concat(parameters('factoryName'), '/tryNonDdcrInstancePoolThenFallbackOnOdcrInstancePool')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -1793,6 +1793,57 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tryJobPoolThenFallbackOnOdcrInstancePool')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Execute Pipeline1",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SwitchLinkedServiceOnCapacityFailure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
+								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
+								"instancePoolId": "1105-210744-foray3-pool-306c6t24",
+								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
+								"acceptedErrorMessages": "@pipeline().parameters.acceptedErrorMessages"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"acceptedErrorMessages": {
+						"type": "string",
+						"defaultValue": [
+							"AZURE_QUOTA_EXCEEDED_EXCEPTION",
+							"INSTANCE_POOL_MAX_CAPACITY_REACHED"
+						]
+					}
+				},
+				"folder": {
+					"name": "ODCR Demo"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SwitchLinkedServiceOnCapacityFailure')]"
 			]
 		},
 		{
