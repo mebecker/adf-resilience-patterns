@@ -1,5 +1,5 @@
 {
-	"name": "AzureDatabricks2",
+	"name": "DatabricksJobClusterLinkedService",
 	"properties": {
 		"annotations": [],
 		"type": "AzureDatabricks",

@@ -1,5 +1,5 @@
 {
-	"name": "AzureDatabricks1",
+	"name": "DatabricksInstancePoolLinkedService",
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
