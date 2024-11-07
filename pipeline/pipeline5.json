@@ -1,0 +1,70 @@
+{
+	"name": "pipeline5",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.ErrorMessages",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@contains('this string contains foo', item())",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Set variable1",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "FoundString",
+											"value": true
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"ErrorMessages": {
+				"type": "array",
+				"defaultValue": [
+					"foo",
+					"bar"
+				]
+			}
+		},
+		"variables": {
+			"ErrorMessages": {
+				"type": "Array"
+			},
+			"FoundString": {
+				"type": "Boolean"
+			},
+			"failoverConditionSatisfied": {
+				"type": "Boolean"
+			}
+		},
+		"annotations": []
+	}
+}

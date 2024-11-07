@@ -26,8 +26,8 @@
 				}
 			},
 			{
-				"name": "Check if failure capacity related",
-				"type": "IfCondition",
+				"name": "CheckAcceptableErrorStrings",
+				"type": "ForEach",
 				"dependsOn": [
 					{
 						"activity": "Run Notebook 1",
@@ -38,11 +38,97 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"expression": {
-						"value": "@or(greater(indexOf(activity('Run Notebook 1').output.runError, 'INSTANCE_POOL_MAX_CAPACITY_REACHED'), 0) ,greater(indexOf(activity('Run Notebook 1').output.runError, 'QuotaExceeded'), 0) )",
+					"items": {
+						"value": "@pipeline().parameters.acceptedErrorMessages",
 						"type": "Expression"
 					},
-					"ifFalseActivities": [
+					"activities": [
+						{
+							"name": "Check if failure capacity related",
+							"type": "IfCondition",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"expression": {
+									"value": "@contains(activity('Run Notebook 1').output.runError, item())",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
+									{
+										"name": "Run Notebook 2",
+										"type": "DatabricksNotebook",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"notebookPath": {
+												"value": "@pipeline().parameters.notebookPath",
+												"type": "Expression"
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "AzureDatabricks1",
+											"type": "LinkedServiceReference",
+											"parameters": {
+												"workspaceUrl": {
+													"value": "@pipeline().parameters.workspaceUrl",
+													"type": "Expression"
+												},
+												"instancePoolId": {
+													"value": "@pipeline().parameters.failoverInstancePoolId",
+													"type": "Expression"
+												},
+												"workspaceResourceId": {
+													"value": "@pipeline().parameters.workspaceResourceId",
+													"type": "Expression"
+												}
+											}
+										}
+									},
+									{
+										"name": "setFailoverConditionSatisfied",
+										"type": "SetVariable",
+										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"variableName": "failoverConditionSatisfied",
+											"value": true
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "FailIfFailoverDidntHappen",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "CheckAcceptableErrorStrings",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(variables('failoverConditionSatisfied'))",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
 						{
 							"name": "Fail1",
 							"type": "Fail",
@@ -51,45 +137,6 @@
 							"typeProperties": {
 								"message": "ERROR_NOT_CAPACITY_RELATED",
 								"errorCode": "123"
-							}
-						}
-					],
-					"ifTrueActivities": [
-						{
-							"name": "Run Notebook 2",
-							"type": "DatabricksNotebook",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"notebookPath": {
-									"value": "@pipeline().parameters.notebookPath",
-									"type": "Expression"
-								}
-							},
-							"linkedServiceName": {
-								"referenceName": "AzureDatabricks1",
-								"type": "LinkedServiceReference",
-								"parameters": {
-									"workspaceUrl": {
-										"value": "@pipeline().parameters.workspaceUrl",
-										"type": "Expression"
-									},
-									"instancePoolId": {
-										"value": "@pipeline().parameters.failoverInstancePoolId",
-										"type": "Expression"
-									},
-									"workspaceResourceId": {
-										"value": "@pipeline().parameters.workspaceResourceId",
-										"type": "Expression"
-									}
-								}
 							}
 						}
 					]
@@ -111,6 +158,9 @@
 			},
 			"workspaceResourceId": {
 				"type": "string"
+			},
+			"acceptedErrorMessages": {
+				"type": "array"
 			}
 		},
 		"variables": {
@@ -147,6 +197,15 @@
 			"maxIterations": {
 				"type": "Integer",
 				"defaultValue": 2
+			},
+			"ErrorMessages": {
+				"type": "Array"
+			},
+			"FoundString": {
+				"type": "Boolean"
+			},
+			"failoverConditionSatisfied": {
+				"type": "Boolean"
 			}
 		},
 		"folder": {
