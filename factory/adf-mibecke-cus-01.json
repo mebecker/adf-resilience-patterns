@@ -25,6 +25,10 @@
 			"failoverInstancePoolId": {
 				"type": "string",
 				"value": "0923-200944-gym276-pool-ezzwvw1s"
+			},
+			"workspaceUrl": {
+				"type": "string",
+				"value": "https://adb-3001519857218975.15.azuredatabricks.net/"
 			}
 		}
 	},
