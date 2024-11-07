@@ -95,7 +95,7 @@
 													"type": "Expression"
 												},
 												"instancePoolId": {
-													"value": "@pipeline().parameters.failoverInstancePoolId",
+													"value": "@pipeline().parameters.instancePoolId",
 													"type": "Expression"
 												},
 												"workspaceResourceId": {
@@ -164,10 +164,7 @@
 			"workspaceUrl": {
 				"type": "string"
 			},
-			"initialInstancePoolId": {
-				"type": "string"
-			},
-			"failoverInstancePoolId": {
+			"instancePoolId": {
 				"type": "string"
 			},
 			"workspaceResourceId": {
