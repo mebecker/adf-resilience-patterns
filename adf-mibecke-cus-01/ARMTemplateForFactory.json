@@ -405,8 +405,8 @@
 						}
 					},
 					{
-						"name": "Check if failure capacity related",
-						"type": "IfCondition",
+						"name": "CheckAcceptableErrorStrings",
+						"type": "ForEach",
 						"dependsOn": [
 							{
 								"activity": "Run Notebook 1",
@@ -417,11 +417,97 @@
 						],
 						"userProperties": [],
 						"typeProperties": {
-							"expression": {
-								"value": "@or(greater(indexOf(activity('Run Notebook 1').output.runError, 'INSTANCE_POOL_MAX_CAPACITY_REACHED'), 0) ,greater(indexOf(activity('Run Notebook 1').output.runError, 'QuotaExceeded'), 0) )",
+							"items": {
+								"value": "@pipeline().parameters.acceptedErrorMessages",
 								"type": "Expression"
 							},
-							"ifFalseActivities": [
+							"activities": [
+								{
+									"name": "Check if failure capacity related",
+									"type": "IfCondition",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@contains(activity('Run Notebook 1').output.runError, item())",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Run Notebook 2",
+												"type": "DatabricksNotebook",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"notebookPath": {
+														"value": "@pipeline().parameters.notebookPath",
+														"type": "Expression"
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "AzureDatabricks1",
+													"type": "LinkedServiceReference",
+													"parameters": {
+														"workspaceUrl": {
+															"value": "@pipeline().parameters.workspaceUrl",
+															"type": "Expression"
+														},
+														"instancePoolId": {
+															"value": "@pipeline().parameters.failoverInstancePoolId",
+															"type": "Expression"
+														},
+														"workspaceResourceId": {
+															"value": "@pipeline().parameters.workspaceResourceId",
+															"type": "Expression"
+														}
+													}
+												}
+											},
+											{
+												"name": "setFailoverConditionSatisfied",
+												"type": "SetVariable",
+												"dependsOn": [],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "failoverConditionSatisfied",
+													"value": true
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "FailIfFailoverDidntHappen",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "CheckAcceptableErrorStrings",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(variables('failoverConditionSatisfied'))",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
 								{
 									"name": "Fail1",
 									"type": "Fail",
@@ -430,45 +516,6 @@
 									"typeProperties": {
 										"message": "ERROR_NOT_CAPACITY_RELATED",
 										"errorCode": "123"
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "Run Notebook 2",
-									"type": "DatabricksNotebook",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"notebookPath": {
-											"value": "@pipeline().parameters.notebookPath",
-											"type": "Expression"
-										}
-									},
-									"linkedServiceName": {
-										"referenceName": "AzureDatabricks1",
-										"type": "LinkedServiceReference",
-										"parameters": {
-											"workspaceUrl": {
-												"value": "@pipeline().parameters.workspaceUrl",
-												"type": "Expression"
-											},
-											"instancePoolId": {
-												"value": "@pipeline().parameters.failoverInstancePoolId",
-												"type": "Expression"
-											},
-											"workspaceResourceId": {
-												"value": "@pipeline().parameters.workspaceResourceId",
-												"type": "Expression"
-											}
-										}
 									}
 								}
 							]
@@ -493,6 +540,9 @@
 					},
 					"workspaceResourceId": {
 						"type": "string"
+					},
+					"acceptedErrorMessages": {
+						"type": "array"
 					}
 				},
 				"variables": {
@@ -529,6 +579,15 @@
 					"maxIterations": {
 						"type": "Integer",
 						"defaultValue": 2
+					},
+					"ErrorMessages": {
+						"type": "Array"
+					},
+					"FoundString": {
+						"type": "Boolean"
+					},
+					"failoverConditionSatisfied": {
+						"type": "Boolean"
 					}
 				},
 				"folder": {
@@ -1061,13 +1120,19 @@
 								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
 								"initialInstancePoolId": "1105-210710-awing2-pool-bv7hvz4s",
 								"failoverInstancePoolId": "1105-210744-foray3-pool-306c6t24",
-								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01"
+								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
+								"acceptedErrorMessages": "[[\"AZURE_QUOTA_EXCEEDED_EXCEPTION\", \"INSTANCE_POOL_MAX_CAPACITY_REACHED\"]"
 							}
 						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"failoverConditionSatisfied": {
+						"type": "Boolean"
+					}
 				},
 				"folder": {
 					"name": "ODCR Demo"
@@ -1374,6 +1439,82 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline5')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.ErrorMessages",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@contains('this string contains foo', item())",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Set variable1",
+												"type": "SetVariable",
+												"dependsOn": [],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "FoundString",
+													"value": true
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ErrorMessages": {
+						"type": "array",
+						"defaultValue": [
+							"foo",
+							"bar"
+						]
+					}
+				},
+				"variables": {
+					"ErrorMessages": {
+						"type": "Array"
+					},
+					"FoundString": {
+						"type": "Boolean"
+					},
+					"failoverConditionSatisfied": {
+						"type": "Boolean"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/default')]",
