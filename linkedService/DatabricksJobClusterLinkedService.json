@@ -4,6 +4,9 @@
 		"parameters": {
 			"workspaceUrl": {
 				"type": "string"
+			},
+			"workspaceResourceId": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
