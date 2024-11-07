@@ -32,7 +32,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "DatabricksJobClusterLinkedService",
+								"referenceName": "DatabricksInstancePoolLinkedService",
 								"type": "LinkedServiceReference",
 								"parameters": {
 									"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
