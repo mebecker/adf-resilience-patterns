@@ -1,6 +1,11 @@
 {
 	"name": "DatabricksJobClusterLinkedService",
 	"properties": {
+		"parameters": {
+			"workspaceUrl": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "AzureDatabricks",
 		"typeProperties": {
