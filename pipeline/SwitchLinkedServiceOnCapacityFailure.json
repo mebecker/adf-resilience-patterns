@@ -22,7 +22,17 @@
 				},
 				"linkedServiceName": {
 					"referenceName": "DatabricksJobClusterLinkedService",
-					"type": "LinkedServiceReference"
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"workspaceUrl": {
+							"value": "@pipeline().parameters.workspaceUrl",
+							"type": "Expression"
+						},
+						"workspaceResourceId": {
+							"value": "@pipeline().parameters.workspaceResourceId",
+							"type": "Expression"
+						}
+					}
 				}
 			},
 			{
