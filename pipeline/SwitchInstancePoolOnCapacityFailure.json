@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Run Notebook 1",
+				"name": "InitialNotebookRunAttempt",
 				"type": "DatabricksNotebook",
 				"dependsOn": [],
 				"policy": {
@@ -44,7 +44,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Run Notebook 1",
+						"activity": "InitialNotebookRunAttempt",
 						"dependencyConditions": [
 							"Failed"
 						]
@@ -69,7 +69,7 @@
 								},
 								"ifTrueActivities": [
 									{
-										"name": "Run Notebook 2",
+										"name": "FailoverNotebookRunAttempt",
 										"type": "DatabricksNotebook",
 										"dependsOn": [],
 										"policy": {
