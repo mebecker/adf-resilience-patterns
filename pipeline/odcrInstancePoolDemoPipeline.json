@@ -32,7 +32,11 @@
 		],
 		"parameters": {
 			"acceptedErrorMessages": {
-				"type": "array"
+				"type": "array",
+				"defaultValue": [
+					"AZURE_QUOTA_EXCEEDED_EXCEPTION",
+					"INSTANCE_POOL_MAX_CAPACITY_REACHED"
+				]
 			}
 		},
 		"variables": {
