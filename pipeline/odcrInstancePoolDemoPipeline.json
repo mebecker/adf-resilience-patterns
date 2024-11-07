@@ -32,7 +32,7 @@
 		],
 		"parameters": {
 			"acceptedErrorMessages": {
-				"type": "string"
+				"type": "array"
 			}
 		},
 		"variables": {
