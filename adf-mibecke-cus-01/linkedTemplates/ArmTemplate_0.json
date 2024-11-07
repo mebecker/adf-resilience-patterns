@@ -1321,6 +1321,11 @@
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"parameters": {
+					"acceptedErrorMessages": {
+						"type": "string"
+					}
+				},
 				"variables": {
 					"failoverConditionSatisfied": {
 						"type": "Boolean"
