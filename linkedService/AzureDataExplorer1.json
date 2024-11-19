@@ -1,0 +1,15 @@
+{
+	"name": "AzureDataExplorer1",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDataExplorer",
+		"typeProperties": {
+			"endpoint": "https://adx-mibecke-01.centralus.kusto.windows.net",
+			"database": "db1"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
