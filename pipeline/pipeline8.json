@@ -141,11 +141,34 @@
 										"supportRFC5988": "true"
 									}
 								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
 								"enableStaging": false
 							},
 							"inputs": [
 								{
-									"referenceName": "RestResource2",
+									"referenceName": "LogFile",
+									"type": "DatasetReference",
+									"parameters": {
+										"LogFilePath": {
+											"value": "@item().LogFile",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DelimitedText4",
 									"type": "DatasetReference"
 								}
 							]
