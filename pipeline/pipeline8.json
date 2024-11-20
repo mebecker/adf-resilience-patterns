@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "SalesforceV2Source",
-						"query": "SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(\n             +'API'+,\n             +'ApexCallout'+,\n             +'ApexExecution'+,\n             +'ApexRestApi'+,\n             +'ApexSoap'+,\n             +'ApexTrigger'+,\n             +'ApexUnexpectedException'+,\n             +'ApiTotalUsage'+,\n             +'BulkApi'+,\n             +'BulkApiRequest'+,\n             +'BulkApi2'+,\n             +'ConcurrentLongRunningApexLimit'+,\n             +'FlowExecution'+,\n             +'Login'+,\n             +'LoginAs'+,\n             +'QueuedExecution'+,\n             +'RestApi'+\n+)+and+interval+=+'Hourly'",
+						"query": "SELECT Id, EventType,LogFile,LogDate,LogFileLength FROM  EventLogFile WHERE CreatedDate > Yesterday AND EventType in (\n\t'API', \n\t'ApexCallout',\n\t'ApexExecution',\n\t'ApexRestApi',\n\t'ApexSoap',\n\t'ApexTrigger',\n\t'ApexUnexpectedException',\n\t'ApiTotalUsage',\n\t'BulkApi',\n\t'BulkApiRequest',\n\t'BulkApi2',\n\t'ConcurrentLongRunningApexLimit',\n\t'FlowExecution',\n\t'Login',\n\t'LoginAs',\n\t'QueuedExecution',\n\t'RestApi'\n)AND Interval ='Hourly'",
 						"includeDeletedObjects": false
 					},
 					"sink": {
