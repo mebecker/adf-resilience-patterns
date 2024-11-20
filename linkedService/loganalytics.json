@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://dce-ingestion-gczf.centralus-1.ingest.monitor.azure.com/dataCollectionRules/dcr-a3447c69e7ab4fbcb629745a2505606b/streams/ Custom-SalesforceLogs_CL?api-version=2023-01-01",
+			"url": "https://dce-ingestion-gczf.centralus-1.ingest.monitor.azure.com/dataCollectionRules/dcr-a3447c69e7ab4fbcb629745a2505606b/streams/Custom-SalesforceLogs_CL?api-version=2023-01-01",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "ManagedServiceIdentity",
 			"aadResourceId": "https://monitor.azure.com"
