@@ -1,0 +1,63 @@
+{
+	"name": "pipeline8",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SalesforceV2Source",
+						"query": "SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(\n             +'API'+,\n             +'ApexCallout'+,\n             +'ApexExecution'+,\n             +'ApexRestApi'+,\n             +'ApexSoap'+,\n             +'ApexTrigger'+,\n             +'ApexUnexpectedException'+,\n             +'ApiTotalUsage'+,\n             +'BulkApi'+,\n             +'BulkApiRequest'+,\n             +'BulkApi2'+,\n             +'ConcurrentLongRunningApexLimit'+,\n             +'FlowExecution'+,\n             +'Login'+,\n             +'LoginAs'+,\n             +'QueuedExecution'+,\n             +'RestApi'+\n+)+and+interval+=+'Hourly'",
+						"includeDeletedObjects": false
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "SalesforceObject1",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DelimitedText3",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"folder": {
+			"name": "adx"
+		},
+		"annotations": []
+	}
+}
