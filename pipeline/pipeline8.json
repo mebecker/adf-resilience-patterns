@@ -103,8 +103,6 @@
 						{
 							"name": "Set variable1",
 							"type": "SetVariable",
-							"state": "Inactive",
-							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"secureOutput": false,
@@ -114,7 +112,7 @@
 							"typeProperties": {
 								"variableName": "url",
 								"value": {
-									"value": "@item().LogFile",
+									"value": "@join(skip(split(item().LogFile, '/'), 3), '/')",
 									"type": "Expression"
 								}
 							}
@@ -122,6 +120,8 @@
 						{
 							"name": "Copy data2",
 							"type": "Copy",
+							"state": "Inactive",
+							"onInactiveMarkAs": "Succeeded",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "0.12:00:00",
