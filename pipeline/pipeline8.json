@@ -112,7 +112,7 @@
 							"typeProperties": {
 								"variableName": "url",
 								"value": {
-									"value": "@item().records[*].attributes.url",
+									"value": "@item()",
 									"type": "Expression"
 								}
 							}
