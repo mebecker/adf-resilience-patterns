@@ -5,6 +5,21 @@
 		"factoryName": {
 			"value": "adf-mibecke-cus-01"
 		},
+		"AzureDataExplorer1_properties_typeProperties_endpoint": {
+			"value": "https://adx-mibecke-01.centralus.kusto.windows.net"
+		},
+		"AzureDataExplorer1_properties_typeProperties_database": {
+			"value": "db1"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"value": "https://samibeckecus01.dfs.core.windows.net/"
+		},
+		"loganalytics_properties_typeProperties_url": {
+			"value": "https://dce-ingestion-gczf.centralus-1.ingest.monitor.azure.com/dataCollectionRules/dcr-a3447c69e7ab4fbcb629745a2505606b/streams/Custom-SalesforceLogs_CL?api-version=2023-01-01"
+		},
+		"loganalytics_properties_typeProperties_aadResourceId": {
+			"value": "https://monitor.azure.com"
+		},
 		"AzureSynapseAnalytics432_properties_privateLinkResourceId": {
 			"value": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-synapse/providers/Microsoft.Synapse/workspaces/syn-mibecke-cus-01"
 		},
@@ -33,6 +48,9 @@
 		},
 		"default_properties_failoverInstancePoolId_value": {
 			"value": "0923-200944-gym276-pool-ezzwvw1s"
+		},
+		"default_properties_workspaceUrl_value": {
+			"value": "https://adb-3001519857218975.15.azuredatabricks.net/"
 		}
 	}
 }

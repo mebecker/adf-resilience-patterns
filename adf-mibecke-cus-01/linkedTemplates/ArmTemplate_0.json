@@ -31,6 +31,10 @@
 			"type": "string",
 			"defaultValue": "0923-200944-gym276-pool-ezzwvw1s"
 		},
+		"default_properties_workspaceUrl_value": {
+			"type": "string",
+			"defaultValue": "https://adb-3001519857218975.15.azuredatabricks.net/"
+		},
 		"AzureSynapseAnalytics432_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-synapse/providers/Microsoft.Synapse/workspaces/syn-mibecke-cus-01"
@@ -44,6 +48,26 @@
 			"defaultValue": [
 				"syn-mibecke-cus-01.sql.azuresynapse.net"
 			]
+		},
+		"AzureDataExplorer1_properties_typeProperties_endpoint": {
+			"type": "string",
+			"defaultValue": "https://adx-mibecke-01.centralus.kusto.windows.net"
+		},
+		"AzureDataExplorer1_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "db1"
+		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://samibeckecus01.dfs.core.windows.net/"
+		},
+		"loganalytics_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dce-ingestion-gczf.centralus-1.ingest.monitor.azure.com/dataCollectionRules/dcr-a3447c69e7ab4fbcb629745a2505606b/streams/Custom-SalesforceLogs_CL?api-version=2023-01-01"
+		},
+		"loganalytics_properties_typeProperties_aadResourceId": {
+			"type": "string",
+			"defaultValue": "https://monitor.azure.com"
 		}
 	},
 	"variables": {
@@ -78,6 +102,10 @@
 				"failoverInstancePoolId": {
 					"type": "string",
 					"value": "[parameters('default_properties_failoverInstancePoolId_value')]"
+				},
+				"workspaceUrl": {
+					"type": "string",
+					"value": "[parameters('default_properties_workspaceUrl_value')]"
 				}
 			},
 			"dependsOn": []
@@ -1289,93 +1317,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/tryNonDdcrInstancePoolThenFallbackOnOdcrInstancePool')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Execute Pipeline1",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "SwitchInstancePoolOnCapacityFailure",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
-								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
-								"initialInstancePoolId": "1105-210710-awing2-pool-bv7hvz4s",
-								"failoverInstancePoolId": "1105-210744-foray3-pool-306c6t24",
-								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
-								"acceptedErrorMessages": {
-									"value": "@pipeline().parameters.acceptedErrorMessages",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
-						"name": "Execute Pipeline2",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "SwitchInstancePoolOnCapacityFailure",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
-								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
-								"initialInstancePoolId": "1105-210710-awing2-pool-bv7hvz4s",
-								"failoverInstancePoolId": "1105-210744-foray3-pool-306c6t24",
-								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
-								"acceptedErrorMessages": {
-									"value": "@pipeline().parameters.acceptedErrorMessages",
-									"type": "Expression"
-								}
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"acceptedErrorMessages": {
-						"type": "array",
-						"defaultValue": [
-							"AZURE_QUOTA_EXCEEDED_EXCEPTION",
-							"INSTANCE_POOL_MAX_CAPACITY_REACHED"
-						]
-					}
-				},
-				"variables": {
-					"failoverConditionSatisfied": {
-						"type": "Boolean"
-					}
-				},
-				"folder": {
-					"name": "ODCR Demo"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/SwitchInstancePoolOnCapacityFailure')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1531,6 +1472,132 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/tryNonDdcrInstancePoolThenFallbackOnOdcrInstancePool')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Execute Pipeline1",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SwitchInstancePoolOnCapacityFailure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
+								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
+								"initialInstancePoolId": "1105-210710-awing2-pool-bv7hvz4s",
+								"failoverInstancePoolId": "1105-210744-foray3-pool-306c6t24",
+								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
+								"acceptedErrorMessages": {
+									"value": "@pipeline().parameters.acceptedErrorMessages",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "Execute Pipeline2",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "SwitchInstancePoolOnCapacityFailure",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
+								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
+								"initialInstancePoolId": "1105-210710-awing2-pool-bv7hvz4s",
+								"failoverInstancePoolId": "1105-210744-foray3-pool-306c6t24",
+								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
+								"acceptedErrorMessages": {
+									"value": "@pipeline().parameters.acceptedErrorMessages",
+									"type": "Expression"
+								}
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"acceptedErrorMessages": {
+						"type": "array",
+						"defaultValue": [
+							"AZURE_QUOTA_EXCEEDED_EXCEPTION",
+							"INSTANCE_POOL_MAX_CAPACITY_REACHED"
+						]
+					}
+				},
+				"variables": {
+					"failoverConditionSatisfied": {
+						"type": "Boolean"
+					}
+				},
+				"folder": {
+					"name": "ODCR Demo"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/SwitchInstancePoolOnCapacityFailure')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataExplorer1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDataExplorer",
+				"typeProperties": {
+					"endpoint": "[parameters('AzureDataExplorer1_properties_typeProperties_endpoint')]",
+					"database": "[parameters('AzureDataExplorer1_properties_typeProperties_database')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DatabricksJobClusterLinkedService')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -1554,6 +1621,28 @@
 					"newClusterVersion": "15.4.x-scala2.12",
 					"clusterOption": "Fixed",
 					"newClusterInitScripts": []
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/loganalytics')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('loganalytics_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "ManagedServiceIdentity",
+					"aadResourceId": "[parameters('loganalytics_properties_typeProperties_aadResourceId')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -1835,57 +1924,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/RepairTable')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tryJobPoolThenFallbackOnOdcrInstancePool')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Execute Pipeline1",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "SwitchLinkedServiceOnCapacityFailure",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
-								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
-								"instancePoolId": "1105-210744-foray3-pool-306c6t24",
-								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
-								"acceptedErrorMessages": "@pipeline().parameters.acceptedErrorMessages"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"acceptedErrorMessages": {
-						"type": "string",
-						"defaultValue": [
-							"AZURE_QUOTA_EXCEEDED_EXCEPTION",
-							"INSTANCE_POOL_MAX_CAPACITY_REACHED"
-						]
-					}
-				},
-				"folder": {
-					"name": "ODCR Demo"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/SwitchLinkedServiceOnCapacityFailure')]"
 			]
 		}
 	]
