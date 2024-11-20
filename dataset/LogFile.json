@@ -1,0 +1,23 @@
+{
+	"name": "LogFile",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Salesforce Data API",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"LogFilePath": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@join(skip(split(dataset().LogFilePath, '/'), 3), '/')",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}
