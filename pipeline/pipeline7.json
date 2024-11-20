@@ -40,11 +40,26 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "[",
-									"type": "String"
+									"path": "$['timestamp']"
 								},
 								"sink": {
-									"path": "$['[']"
+									"path": "$['timestamp']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['logEntry']"
+								},
+								"sink": {
+									"path": "$['logEntry']"
+								}
+							},
+							{
+								"source": {
+									"path": "$['AdditionalContext']"
+								},
+								"sink": {
+									"path": "$['AdditionalContext']"
 								}
 							}
 						]
