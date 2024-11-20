@@ -96,7 +96,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Lookup1').output",
 						"type": "Expression"
 					},
 					"activities": [
@@ -111,7 +111,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "url",
-								"value": "@item().records[*].attributes.url"
+								"value": {
+									"value": "@item().records[*].attributes.url",
+									"type": "Expression"
+								}
 							}
 						}
 					]
