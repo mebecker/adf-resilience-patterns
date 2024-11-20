@@ -14,7 +14,7 @@
 		"type": "RestResource",
 		"typeProperties": {
 			"relativeUrl": {
-				"value": "@join(skip(split(dataset().LogFilePath, '/'), 3), '/')",
+				"value": "@dataset().LogFilePath",
 				"type": "Expression"
 			}
 		},
