@@ -1,0 +1,20 @@
+{
+	"name": "Salesforce Data API",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://cona.my.salesforce.com/services/data/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "OAuth2ClientCredential",
+			"clientId": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI",
+			"tokenEndpoint": "https://cona.my.salesforce.com/services/oauth2/token",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDQ5NTFDNUNELUM1RDctNEYwNC05QTkwLTkwMzAxMkIxMjg2Rl8wYmU5ZGRlNC1kNDVhLTQ2ODUtYjcxMC04YTYxYjM2NWZiNDIiDQp9"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
