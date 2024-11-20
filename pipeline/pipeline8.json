@@ -96,17 +96,22 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Lookup1').output.value",
+						"value": "@activity('Lookup1').output",
 						"type": "Expression"
 					},
 					"activities": [
 						{
-							"name": "Wait1",
-							"type": "Wait",
+							"name": "Set variable1",
+							"type": "SetVariable",
 							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
-								"waitTimeInSeconds": 1
+								"variableName": "url",
+								"value": "@item().LogFile"
 							}
 						}
 					]
