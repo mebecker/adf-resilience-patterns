@@ -190,8 +190,8 @@
 									"x-ms-version": "2019-07-07",
 									"x-ms-blob-type": "BlockBlob",
 									"Authentication": "Managed Identity",
-									"Content-Encoding": "gzip",
-									"Content-Type": "application/csv"
+									"ContentEncoding": "gzip",
+									"ContentType": "application/csv"
 								},
 								"url": {
 									"value": "@concat('https://samibeckecus01.blob.core.windows.net/data/salesforce/', item().EventType, '.csv?resource=file')",
