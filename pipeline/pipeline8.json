@@ -294,7 +294,7 @@
 				}
 			},
 			{
-				"name": "Web2",
+				"name": "WriteLogFileToStorage",
 				"type": "WebActivity",
 				"dependsOn": [
 					{
@@ -342,7 +342,7 @@
 					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
+					"secureOutput": true,
 					"secureInput": false
 				},
 				"userProperties": [],
@@ -367,7 +367,7 @@
 					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
+					"secureOutput": true,
 					"secureInput": false
 				},
 				"userProperties": [],
@@ -389,7 +389,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "GetSalesforceOauthToken",
+						"activity": "Set Bearer Token",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -407,7 +407,7 @@
 					"method": "GET",
 					"headers": {
 						"Authorization": {
-							"value": "@concat('Bearer ', activity('GetSalesforceOauthToken').output.access_token)",
+							"value": "@variables('BearerToken')",
 							"type": "Expression"
 						}
 					},
@@ -415,6 +415,30 @@
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
+					}
+				}
+			},
+			{
+				"name": "Set Bearer Token",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "GetSalesforceOauthToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "BearerToken",
+					"value": {
+						"value": "@concat('Bearer ', activity('GetSalesforceOauthToken').output.access_token)",
+						"type": "Expression"
 					}
 				}
 			}
@@ -427,6 +451,9 @@
 				"type": "String"
 			},
 			"url2": {
+				"type": "String"
+			},
+			"BearerToken": {
 				"type": "String"
 			}
 		},
