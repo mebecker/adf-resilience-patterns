@@ -294,49 +294,6 @@
 				}
 			},
 			{
-				"name": "WriteLogFileToStorage",
-				"type": "WebActivity",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "GetLogFile",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"method": "PUT",
-					"headers": {
-						"x-ms-version": "2019-07-07",
-						"x-ms-blob-type": "BlockBlob",
-						"Authentication": "Managed Identity"
-					},
-					"url": "https://samibeckecus01.blob.core.windows.net/data/salesforce/hello.csv?resource=file",
-					"connectVia": {
-						"referenceName": "AutoResolveIntegrationRuntime",
-						"type": "IntegrationRuntimeReference"
-					},
-					"body": {
-						"value": "@activity('GetLogFile').output.Response",
-						"type": "Expression"
-					},
-					"authentication": {
-						"type": "MSI",
-						"resource": "https://storage.azure.com"
-					}
-				}
-			},
-			{
 				"name": "GetOAuthClientId",
 				"type": "WebActivity",
 				"dependsOn": [],
@@ -383,42 +340,6 @@
 					"authentication": {
 						"type": "MSI",
 						"resource": "https://vault.azure.net"
-					}
-				}
-			},
-			{
-				"name": "GetLogFile",
-				"type": "WebActivity",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "Set Bearer Token",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"method": "GET",
-					"headers": {
-						"Authorization": {
-							"value": "@variables('BearerToken')",
-							"type": "Expression"
-						}
-					},
-					"url": "https://cona.my.salesforce.com/services/data/v62.0/sobjects/EventLogFile/0AT7V00000C784AWAR/LogFile",
-					"connectVia": {
-						"referenceName": "AutoResolveIntegrationRuntime",
-						"type": "IntegrationRuntimeReference"
 					}
 				}
 			},
@@ -494,17 +415,82 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('GetListOfLogFiles').output.value[0].records",
+						"value": "@activity('GetListOfLogFiles').output.records",
 						"type": "Expression"
 					},
 					"activities": [
 						{
-							"name": "Wait1",
-							"type": "Wait",
-							"dependsOn": [],
+							"name": "WriteLogFileToStorage",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "GetLogFile",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
-								"waitTimeInSeconds": 1
+								"method": "PUT",
+								"headers": {
+									"x-ms-version": "2019-07-07",
+									"x-ms-blob-type": "BlockBlob",
+									"Authentication": "Managed Identity"
+								},
+								"url": {
+									"value": "@concat('https://samibeckecus01.blob.core.windows.net/data/salesforce/', item().EventType, '.csv?resource=file')",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"body": {
+									"value": "@activity('GetLogFile').output.Response",
+									"type": "Expression"
+								},
+								"authentication": {
+									"type": "MSI",
+									"resource": "https://storage.azure.com"
+								}
+							}
+						},
+						{
+							"name": "GetLogFile",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "GET",
+								"headers": {
+									"Authorization": {
+										"value": "@variables('BearerToken')",
+										"type": "Expression"
+									}
+								},
+								"url": {
+									"value": "@concat('https://cona.my.salesforce.com/',item().LogFile)",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								}
 							}
 						}
 					]
