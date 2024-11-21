@@ -407,7 +407,7 @@
 					"method": "GET",
 					"headers": {
 						"Authorization": {
-							"value": "@concat('Bearer ', activity('GetSalesforceOauthToken').output.Response.access_token)",
+							"value": "@concat('Bearer ', activity('GetSalesforceOauthToken').output.access_token)",
 							"type": "Expression"
 						}
 					},
