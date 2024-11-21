@@ -296,6 +296,8 @@
 			{
 				"name": "WriteLogFileToStorage",
 				"type": "WebActivity",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetLogFile",
@@ -387,6 +389,8 @@
 			{
 				"name": "GetLogFile",
 				"type": "WebActivity",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Set Bearer Token",
@@ -439,6 +443,40 @@
 					"value": {
 						"value": "@concat('Bearer ', activity('GetSalesforceOauthToken').output.access_token)",
 						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "GetListOfLogFiles",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Set Bearer Token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"headers": {
+						"Authorization": {
+							"value": "@variables('BearerToken')",
+							"type": "Expression"
+						}
+					},
+					"url": "https://cona.my.salesforce.com/services/data/v62.0/query?q=SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(+'API'+,+'ApexCallout'+,+'ApexExecution'+,+'ApexRestApi'+,+'ApexSoap'+,+'ApexTrigger'+,+'ApexUnexpectedException'+,+'ApiTotalUsage'+,+'BulkApi'+,+'BulkApiRequest'+,+'BulkApi2'+,+'ConcurrentLongRunningApexLimit'+,+'FlowExecution'+,+'Login'+,+'LoginAs'+,+'QueuedExecution'+,+'RestApi'++)+and+interval+=+'Hourly'",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
 					}
 				}
 			}
