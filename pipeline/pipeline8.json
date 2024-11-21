@@ -23,8 +23,8 @@
 					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
+					"secureOutput": true,
+					"secureInput": true
 				},
 				"userProperties": [],
 				"typeProperties": {
@@ -227,7 +227,8 @@
 									"Authorization": {
 										"value": "@variables('BearerToken')",
 										"type": "Expression"
-									}
+									},
+									"Content-Encoding": "gzip"
 								},
 								"url": {
 									"value": "@concat('https://cona.my.salesforce.com/',item().LogFile)",
