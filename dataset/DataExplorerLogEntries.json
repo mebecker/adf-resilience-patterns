@@ -1,0 +1,140 @@
+{
+	"name": "DataExplorerLogEntries",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataExplorer1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureDataExplorerTable",
+		"schema": [
+			{
+				"name": "EVENT_TYPE",
+				"type": "string"
+			},
+			{
+				"name": "TIMESTAMP",
+				"type": "string"
+			},
+			{
+				"name": "REQUEST_ID",
+				"type": "string"
+			},
+			{
+				"name": "ORGANIZATION_ID",
+				"type": "string"
+			},
+			{
+				"name": "USER_ID",
+				"type": "string"
+			},
+			{
+				"name": "RUN_TIME",
+				"type": "string"
+			},
+			{
+				"name": "CPU_TIME",
+				"type": "string"
+			},
+			{
+				"name": "URI",
+				"type": "string"
+			},
+			{
+				"name": "SESSION_KEY",
+				"type": "string"
+			},
+			{
+				"name": "LOGIN_KEY",
+				"type": "string"
+			},
+			{
+				"name": "USER_TYPE",
+				"type": "string"
+			},
+			{
+				"name": "REQUEST_STATUS",
+				"type": "string"
+			},
+			{
+				"name": "DB_TOTAL_TIME",
+				"type": "string"
+			},
+			{
+				"name": "METHOD",
+				"type": "string"
+			},
+			{
+				"name": "MEDIA_TYPE",
+				"type": "string"
+			},
+			{
+				"name": "STATUS_CODE",
+				"type": "string"
+			},
+			{
+				"name": "USER_AGENT",
+				"type": "string"
+			},
+			{
+				"name": "ROWS_PROCESSED",
+				"type": "string"
+			},
+			{
+				"name": "NUMBER_FIELDS",
+				"type": "string"
+			},
+			{
+				"name": "DB_BLOCKS",
+				"type": "string"
+			},
+			{
+				"name": "DB_CPU_TIME",
+				"type": "string"
+			},
+			{
+				"name": "REQUEST_SIZE",
+				"type": "string"
+			},
+			{
+				"name": "RESPONSE_SIZE",
+				"type": "string"
+			},
+			{
+				"name": "ENTITY_NAME",
+				"type": "string"
+			},
+			{
+				"name": "CONNECTED_APP_ID",
+				"type": "string"
+			},
+			{
+				"name": "CLIENT_NAME",
+				"type": "string"
+			},
+			{
+				"name": "EXCEPTION_MESSAGE",
+				"type": "string"
+			},
+			{
+				"name": "TIMESTAMP_DERIVED",
+				"type": "string"
+			},
+			{
+				"name": "USER_ID_DERIVED",
+				"type": "string"
+			},
+			{
+				"name": "CLIENT_IP",
+				"type": "string"
+			},
+			{
+				"name": "URI_ID_DERIVED",
+				"type": "string"
+			}
+		],
+		"typeProperties": {
+			"table": "logEntries"
+		}
+	}
+}

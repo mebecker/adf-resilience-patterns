@@ -1,0 +1,29 @@
+{
+	"name": "SalesforceLogs",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "salesforce",
+				"fileSystem": "data"
+			},
+			"columnDelimiter": ",",
+			"compressionCodec": "gzip",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "\u001f�\b\u0000\u0000\u0000\u0000\u0000\u0000\u0000̽Ys�J�.x߿b��/N\u0007Ƕ��\u0013\b1�b�q\b\u0010b\u0016 �_TY\u001a@l�\u0012���",
+				"type": "String"
+			}
+		]
+	}
+}
