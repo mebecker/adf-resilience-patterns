@@ -257,9 +257,22 @@
 				}
 			},
 			{
-				"name": "Web1",
+				"name": "GetSalesforceOauthToken",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "GetOAuthClientId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "GetOAuthClientSecret",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -270,10 +283,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"method": "GET",
-					"headers": {
-						"Authorization": "Bearer 00D1U0000013zS0!AQIAQJR7UxK2sfgoXguW6y6w4Sg.0vX8mcfdSPOrmcatoNLAgf_RaGzhTimMNYonNMtVxkIISso.T6zGHxoGdFcmhdeu9kSo"
+					"url": {
+						"value": "@concat('https://cona.my.salesforce.com/services/oauth2/token?client_id=', activity('GetOAuthClientId').output, '&client_secret=', activity('GetOAuthClientSecret').output, '&grant_type=client_credentials')",
+						"type": "Expression"
 					},
-					"url": "https://cona.my.salesforce.com/services/data/v62.0/sobjects/EventLogFile/0AT7V00000C784AWAR/LogFile",
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
@@ -285,7 +298,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "Web1",
+						"activity": "GetLogFile",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -318,6 +331,90 @@
 					"authentication": {
 						"type": "MSI",
 						"resource": "https://storage.azure.com"
+					}
+				}
+			},
+			{
+				"name": "GetOAuthClientId",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-id/d32e42f38db041e7a89b554323d29db5?api-version=7.0",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "GetOAuthClientSecret",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-secret/d03bd0500659422b9f080c06c2c56777?api-version=7.0",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					},
+					"authentication": {
+						"type": "MSI",
+						"resource": "https://vault.azure.net"
+					}
+				}
+			},
+			{
+				"name": "GetLogFile",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "GetSalesforceOauthToken",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"headers": {
+						"Authorization": {
+							"value": "@concat('Bearer ', activity('GetSalesforceOauthToken').output.Response.access_token)",
+							"type": "Expression"
+						}
+					},
+					"url": "https://cona.my.salesforce.com/services/data/v62.0/sobjects/EventLogFile/0AT7V00000C784AWAR/LogFile",
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
 					}
 				}
 			}
