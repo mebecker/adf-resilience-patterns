@@ -10,6 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": "0AT7V00000C78WhWAJ",
 				"folderPath": "salesforce",
 				"fileSystem": "data"
 			},
@@ -21,7 +22,127 @@
 		},
 		"schema": [
 			{
-				"name": "\u001f�\b\u0000\u0000\u0000\u0000\u0000\u0000\u0000̽Ys�J�.x߿b��/N\u0007Ƕ��\u0013\b1�b�q\b\u0010b\u0016 �_TY\u001a@l�\u0012���",
+				"name": "EVENT_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "TIMESTAMP",
+				"type": "String"
+			},
+			{
+				"name": "REQUEST_ID",
+				"type": "String"
+			},
+			{
+				"name": "ORGANIZATION_ID",
+				"type": "String"
+			},
+			{
+				"name": "USER_ID",
+				"type": "String"
+			},
+			{
+				"name": "RUN_TIME",
+				"type": "String"
+			},
+			{
+				"name": "CPU_TIME",
+				"type": "String"
+			},
+			{
+				"name": "URI",
+				"type": "String"
+			},
+			{
+				"name": "SESSION_KEY",
+				"type": "String"
+			},
+			{
+				"name": "LOGIN_KEY",
+				"type": "String"
+			},
+			{
+				"name": "USER_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "REQUEST_STATUS",
+				"type": "String"
+			},
+			{
+				"name": "DB_TOTAL_TIME",
+				"type": "String"
+			},
+			{
+				"name": "METHOD",
+				"type": "String"
+			},
+			{
+				"name": "MEDIA_TYPE",
+				"type": "String"
+			},
+			{
+				"name": "STATUS_CODE",
+				"type": "String"
+			},
+			{
+				"name": "USER_AGENT",
+				"type": "String"
+			},
+			{
+				"name": "ROWS_PROCESSED",
+				"type": "String"
+			},
+			{
+				"name": "NUMBER_FIELDS",
+				"type": "String"
+			},
+			{
+				"name": "DB_BLOCKS",
+				"type": "String"
+			},
+			{
+				"name": "DB_CPU_TIME",
+				"type": "String"
+			},
+			{
+				"name": "REQUEST_SIZE",
+				"type": "String"
+			},
+			{
+				"name": "RESPONSE_SIZE",
+				"type": "String"
+			},
+			{
+				"name": "ENTITY_NAME",
+				"type": "String"
+			},
+			{
+				"name": "CONNECTED_APP_ID",
+				"type": "String"
+			},
+			{
+				"name": "CLIENT_NAME",
+				"type": "String"
+			},
+			{
+				"name": "EXCEPTION_MESSAGE",
+				"type": "String"
+			},
+			{
+				"name": "TIMESTAMP_DERIVED",
+				"type": "String"
+			},
+			{
+				"name": "USER_ID_DERIVED",
+				"type": "String"
+			},
+			{
+				"name": "CLIENT_IP",
+				"type": "String"
+			},
+			{
+				"name": "URI_ID_DERIVED",
 				"type": "String"
 			}
 		]

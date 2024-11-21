@@ -20,6 +20,8 @@
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
+							"wildcardFolderPath": "salesforce",
+							"wildcardFileName": "*",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -77,138 +79,6 @@
 								},
 								"sink": {
 									"name": "ORGANIZATION_ID",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "USER_ID",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "USER_ID",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "RUN_TIME",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "RUN_TIME",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "CPU_TIME",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "CPU_TIME",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "URI",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "URI",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "SESSION_KEY",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "SESSION_KEY",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "LOGIN_KEY",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "LOGIN_KEY",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "DB_TOTAL_TIME",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "DB_TOTAL_TIME",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "TIMESTAMP_DERIVED",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "TIMESTAMP_DERIVED",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "USER_ID_DERIVED",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "USER_ID_DERIVED",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "CLIENT_IP",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "CLIENT_IP",
-									"type": "String",
-									"physicalType": "string"
-								}
-							},
-							{
-								"source": {
-									"name": "URI_ID_DERIVED",
-									"type": "String",
-									"physicalType": "String"
-								},
-								"sink": {
-									"name": "URI_ID_DERIVED",
 									"type": "String",
 									"physicalType": "string"
 								}

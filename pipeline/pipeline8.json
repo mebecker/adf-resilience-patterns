@@ -276,8 +276,8 @@
 							"value": "@variables('BearerToken')",
 							"type": "Expression"
 						},
-						"Content-Type": "application/csv",
-						"Accept-Encoding": "gzip"
+						"Accept-Encoding": "gzip",
+						"Content-Type": "text/csv"
 					},
 					"url": {
 						"value": "@concat('https://cona.my.salesforce.com/','/services/data/v62.0/sobjects/EventLogFile/0AT7V00000C78PgWAJ/LogFile')",
@@ -288,6 +288,19 @@
 						"type": "IntegrationRuntimeReference"
 					}
 				}
+			},
+			{
+				"name": "Azure Function1",
+				"type": "AzureFunctionActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
 			}
 		],
 		"variables": {
