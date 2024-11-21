@@ -21,7 +21,7 @@
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
 							"wildcardFolderPath": "salesforce",
-							"wildcardFileName": "*",
+							"wildcardFileName": "0AT7V00000C78WhWAJ",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
@@ -55,8 +55,8 @@
 								},
 								"sink": {
 									"name": "TIMESTAMP",
-									"type": "String",
-									"physicalType": "string"
+									"type": "Double",
+									"physicalType": "real"
 								}
 							},
 							{
@@ -79,6 +79,330 @@
 								},
 								"sink": {
 									"name": "ORGANIZATION_ID",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "USER_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "USER_ID",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "RUN_TIME",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "RUN_TIME",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "CPU_TIME",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CPU_TIME",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "URI",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "URI",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "SESSION_KEY",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "SESSION_KEY",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "LOGIN_KEY",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "LOGIN_KEY",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "USER_TYPE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "USER_TYPE",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "REQUEST_STATUS",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "REQUEST_STATUS",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "DB_TOTAL_TIME",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "DB_TOTAL_TIME",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "METHOD",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "METHOD",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "MEDIA_TYPE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "MEDIA_TYPE",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "STATUS_CODE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "STATUS_CODE",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "USER_AGENT",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "USER_AGENT",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "ROWS_PROCESSED",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ROWS_PROCESSED",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "NUMBER_FIELDS",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "NUMBER_FIELDS",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "DB_BLOCKS",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "DB_BLOCKS",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "DB_CPU_TIME",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "DB_CPU_TIME",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "REQUEST_SIZE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "REQUEST_SIZE",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "RESPONSE_SIZE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "RESPONSE_SIZE",
+									"type": "Int64",
+									"physicalType": "long"
+								}
+							},
+							{
+								"source": {
+									"name": "ENTITY_NAME",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "ENTITY_NAME",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "CONNECTED_APP_ID",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CONNECTED_APP_ID",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "CLIENT_NAME",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CLIENT_NAME",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "EXCEPTION_MESSAGE",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "EXCEPTION_MESSAGE",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "TIMESTAMP_DERIVED",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "TIMESTAMP_DERIVED",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								}
+							},
+							{
+								"source": {
+									"name": "USER_ID_DERIVED",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "USER_ID_DERIVED",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "CLIENT_IP",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "CLIENT_IP",
+									"type": "String",
+									"physicalType": "string"
+								}
+							},
+							{
+								"source": {
+									"name": "URI_ID_DERIVED",
+									"type": "String",
+									"physicalType": "String"
+								},
+								"sink": {
+									"name": "URI_ID_DERIVED",
 									"type": "String",
 									"physicalType": "string"
 								}
