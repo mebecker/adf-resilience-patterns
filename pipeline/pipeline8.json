@@ -228,7 +228,8 @@
 										"value": "@variables('BearerToken')",
 										"type": "Expression"
 									},
-									"Content-Encoding": "gzip"
+									"Content-Type": "application/csv",
+									"Accept-Encoding": "gzip"
 								},
 								"url": {
 									"value": "@concat('https://cona.my.salesforce.com/',item().LogFile)",
