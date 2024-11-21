@@ -116,6 +116,8 @@
 			{
 				"name": "GetListOfLogFiles",
 				"type": "WebActivity",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Set Bearer Token",
@@ -150,6 +152,8 @@
 			{
 				"name": "LoopLogFiles",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetListOfLogFiles",
@@ -244,6 +248,45 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "GetLogFile_copy1",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Set Bearer Token",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": true
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"method": "GET",
+					"headers": {
+						"Authorization": {
+							"value": "@variables('BearerToken')",
+							"type": "Expression"
+						},
+						"Content-Type": "application/csv",
+						"Accept-Encoding": "gzip"
+					},
+					"url": {
+						"value": "@concat('https://cona.my.salesforce.com/','/services/data/v62.0/sobjects/EventLogFile/0AT7V00000C78PgWAJ/LogFile')",
+						"type": "Expression"
+					},
+					"connectVia": {
+						"referenceName": "AutoResolveIntegrationRuntime",
+						"type": "IntegrationRuntimeReference"
+					}
 				}
 			}
 		],
