@@ -1,0 +1,12 @@
+{
+	"name": "RestResource3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Salesforce Data API",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}
