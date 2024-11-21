@@ -325,7 +325,7 @@
 						"type": "IntegrationRuntimeReference"
 					},
 					"body": {
-						"value": "@activity('Web1').output.Response",
+						"value": "@activity('GetLogFile').output.Response",
 						"type": "Expression"
 					},
 					"authentication": {
