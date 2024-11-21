@@ -479,6 +479,36 @@
 						"type": "IntegrationRuntimeReference"
 					}
 				}
+			},
+			{
+				"name": "LoopLogFiles",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetListOfLogFiles",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetListOfLogFiles').output.value[0].records",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Wait1",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 1
+							}
+						}
+					]
+				}
 			}
 		],
 		"variables": {
