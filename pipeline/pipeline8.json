@@ -284,7 +284,7 @@
 				"typeProperties": {
 					"method": "GET",
 					"url": {
-						"value": "@concat('https://cona.my.salesforce.com/services/oauth2/token?client_id=', activity('GetOAuthClientId').output, '&client_secret=', activity('GetOAuthClientSecret').output, '&grant_type=client_credentials')",
+						"value": "@concat('https://cona.my.salesforce.com/services/oauth2/token?client_id=', activity('GetOAuthClientId').output.value, '&client_secret=', activity('GetOAuthClientSecret').output.value, '&grant_type=client_credentials')",
 						"type": "Expression"
 					},
 					"connectVia": {
@@ -373,7 +373,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"method": "GET",
-					"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-secret/d03bd0500659422b9f080c06c2c56777?api-version=7.0",
+					"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-secret/96f223c734a7495db679b9624744ba4e?api-version=7.0",
 					"connectVia": {
 						"referenceName": "AutoResolveIntegrationRuntime",
 						"type": "IntegrationRuntimeReference"
