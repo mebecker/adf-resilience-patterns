@@ -5,12 +5,20 @@
 			"referenceName": "AzureDataLakeStorage1",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"pipelineRunId": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "0AT7V00000C78WhWAJ",
+				"fileName": {
+					"value": "@dataset().pipelineRunId",
+					"type": "Expression"
+				},
 				"folderPath": "salesforce",
 				"fileSystem": "data"
 			},
