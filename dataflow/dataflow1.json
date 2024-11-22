@@ -1,0 +1,103 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SalesforceLogs",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "AzureDataExplorerTable2",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          EVENT_TYPE as string,",
+				"          TIMESTAMP as string,",
+				"          REQUEST_ID as string,",
+				"          ORGANIZATION_ID as string,",
+				"          USER_ID as string,",
+				"          RUN_TIME as string,",
+				"          CPU_TIME as string,",
+				"          URI as string,",
+				"          SESSION_KEY as string,",
+				"          LOGIN_KEY as string,",
+				"          USER_TYPE as string,",
+				"          REQUEST_STATUS as string,",
+				"          DB_TOTAL_TIME as string,",
+				"          METHOD as string,",
+				"          MEDIA_TYPE as string,",
+				"          STATUS_CODE as string,",
+				"          USER_AGENT as string,",
+				"          ROWS_PROCESSED as string,",
+				"          NUMBER_FIELDS as string,",
+				"          DB_BLOCKS as string,",
+				"          DB_CPU_TIME as string,",
+				"          REQUEST_SIZE as string,",
+				"          RESPONSE_SIZE as string,",
+				"          ENTITY_NAME as string,",
+				"          CONNECTED_APP_ID as string,",
+				"          CLIENT_NAME as string,",
+				"          EXCEPTION_MESSAGE as string,",
+				"          TIMESTAMP_DERIVED as string,",
+				"          USER_ID_DERIVED as string,",
+				"          CLIENT_IP as string,",
+				"          URI_ID_DERIVED as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> source1",
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          EVENT_TYPE as string,",
+				"          TIMESTAMP as string,",
+				"          REQUEST_ID as string,",
+				"          ORGANIZATION_ID as string,",
+				"          USER_ID as string,",
+				"          RUN_TIME as string,",
+				"          CPU_TIME as string,",
+				"          URI as string,",
+				"          SESSION_KEY as string,",
+				"          LOGIN_KEY as string,",
+				"          USER_TYPE as string,",
+				"          REQUEST_STATUS as string,",
+				"          DB_TOTAL_TIME as string,",
+				"          METHOD as string,",
+				"          MEDIA_TYPE as string,",
+				"          STATUS_CODE as string,",
+				"          USER_AGENT as string,",
+				"          ROWS_PROCESSED as string,",
+				"          NUMBER_FIELDS as string,",
+				"          DB_BLOCKS as string,",
+				"          DB_CPU_TIME as string,",
+				"          REQUEST_SIZE as string,",
+				"          RESPONSE_SIZE as string,",
+				"          ENTITY_NAME as string,",
+				"          CONNECTED_APP_ID as string,",
+				"          CLIENT_NAME as string,",
+				"          EXCEPTION_MESSAGE as string,",
+				"          TIMESTAMP_DERIVED as string,",
+				"          USER_ID_DERIVED as string,",
+				"          CLIENT_IP as string,",
+				"          URI_ID_DERIVED as string",
+				"     ),",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink2"
+			]
+		}
+	}
+}
