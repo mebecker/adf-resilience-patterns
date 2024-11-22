@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"pipelineRunId": {
+			"path": {
 				"type": "string"
 			}
 		},
@@ -16,7 +16,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"folderPath": {
-					"value": "@concat('salesforce/', dataset().pipelineRunId)",
+					"value": "@dataset().path",
 					"type": "Expression"
 				},
 				"fileSystem": "data"
