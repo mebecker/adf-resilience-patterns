@@ -5,6 +5,8 @@
 			{
 				"name": "GetEventTypes",
 				"type": "GetMetadata",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -40,6 +42,8 @@
 			{
 				"name": "ForEach1",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetEventTypes",
@@ -73,6 +77,7 @@
 									"storeSettings": {
 										"type": "AzureBlobFSReadSettings",
 										"recursive": true,
+										"wildcardFileName": "*",
 										"enablePartitionDiscovery": false
 									},
 									"formatSettings": {
@@ -98,7 +103,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"path": {
-											"value": "@concat('salesforce/', 'f4436ff3-dffe-4d12-aaae-d648a9b1df72/',item())",
+											"value": "@concat('salesforce/', 'f4436ff3-dffe-4d12-aaae-d648a9b1df72/',item().name)",
 											"type": "Expression"
 										}
 									}
@@ -110,7 +115,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"table": {
-											"value": "@item()",
+											"value": "@item().name",
 											"type": "Expression"
 										}
 									}
@@ -118,6 +123,33 @@
 							]
 						}
 					]
+				}
+			},
+			{
+				"name": "Notebook1",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/GetSalesforceLogFile",
+					"baseParameters": {
+						"sourcePath": "https://cona.my.salesforce.com/services/data/v62.0/sobjects/EventLogFile/0AT7V00000C78wBWAR/LogFile",
+						"targetPath": "https://samibeckecus01.blob.core.windows.net/data/salesforce/f4436ff3-dffe-4d12-aaae-d648a9b1df72/LoginAs/0AT7V00000C78wBWAR",
+						"contentType": "text/csv",
+						"contentEncoding": "gzip",
+						"bearerToken": "00D1U0000013zS0!AQIAQDbMNd84GeugopfhRa_CcqRUBNV0CbGQw9mQGt3rWO2jwT8Lj36aCsZxA36R36LchvFSdEmhfhM3HdJHt1mgo4pdPf1U"
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
