@@ -15,11 +15,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": {
-					"value": "@dataset().pipelineRunId",
+				"folderPath": {
+					"value": "@concat('salesforcelogs/', dataset().pipelineRunId)",
 					"type": "Expression"
 				},
-				"folderPath": "salesforce",
 				"fileSystem": "data"
 			},
 			"columnDelimiter": ",",
