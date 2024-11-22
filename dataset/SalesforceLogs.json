@@ -16,13 +16,12 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"folderPath": {
-					"value": "@concat('salesforcelogs/', dataset().pipelineRunId)",
+					"value": "@concat('salesforce/', dataset().pipelineRunId)",
 					"type": "Expression"
 				},
 				"fileSystem": "data"
 			},
 			"columnDelimiter": ",",
-			"compressionCodec": "gzip",
 			"escapeChar": "\"",
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
