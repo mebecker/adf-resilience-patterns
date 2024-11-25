@@ -119,6 +119,451 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/IngestLogsFromSalesforceToAdx')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetEventTypes",
+						"type": "GetMetadata",
+						"dependsOn": [
+							{
+								"activity": "LoopLogFiles",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "SalesforceLogs",
+								"type": "DatasetReference",
+								"parameters": {
+									"path": {
+										"value": "@variables('pipelineRunId')",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobStorageReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetEventTypes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetEventTypes').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "IngestLogFileToADX",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobStorageReadSettings",
+												"recursive": true,
+												"wildcardFileName": "*",
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "AzureDataExplorerSink"
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SalesforceLogs",
+											"type": "DatasetReference",
+											"parameters": {
+												"path": {
+													"value": "@concat(variables('pipelineRunId'), '/', item().name)",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AzureDataExplorerTable2",
+											"type": "DatasetReference",
+											"parameters": {
+												"table": {
+													"value": "@item().name",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "GetSalesforceOauthToken",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetOAuthClientId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "GetOAuthClientSecret",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": {
+								"value": "@concat('https://cona.my.salesforce.com/services/oauth2/token?client_id=', activity('GetOAuthClientId').output.value, '&client_secret=', activity('GetOAuthClientSecret').output.value, '&grant_type=client_credentials')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					},
+					{
+						"name": "GetOAuthClientId",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "CheckIfPipelineRunIdOverridden",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-id/d32e42f38db041e7a89b554323d29db5?api-version=7.0",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "GetOAuthClientSecret",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "CheckIfPipelineRunIdOverridden",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-secret/96f223c734a7495db679b9624744ba4e?api-version=7.0",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "GetListOfLogFiles",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "StoreAccessToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', variables('accessToken'))",
+									"type": "Expression"
+								}
+							},
+							"url": "https://cona.my.salesforce.com/services/data/v62.0/query?q=SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(+'API'+,+'ApexCallout'+,+'ApexExecution'+,+'ApexRestApi'+,+'ApexSoap'+,+'ApexTrigger'+,+'ApexUnexpectedException'+,+'ApiTotalUsage'+,+'BulkApi'+,+'BulkApiRequest'+,+'BulkApi2'+,+'ConcurrentLongRunningApexLimit'+,+'FlowExecution'+,+'Login'+,+'LoginAs'+,+'QueuedExecution'+,+'RestApi'++)+and+interval+=+'Hourly'",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					},
+					{
+						"name": "LoopLogFiles",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetListOfLogFiles",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetListOfLogFiles').output.records",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "PullLogFileToBlobStorage",
+									"type": "AzureFunctionActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"functionName": "process_salesforce_logs",
+										"body": {
+											"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com', item().LogFile, '\",', '\"accessToken\": \"', base64(variables('accessToken')), '\",', '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce/', variables('pipelineRunId'), '/', item().EventType, '\"}')",
+											"type": "Expression"
+										},
+										"headers": {},
+										"method": "POST"
+									},
+									"linkedServiceName": {
+										"referenceName": "AzureFunction1",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "DummySetOnFailure",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "PullLogFileToBlobStorage",
+											"dependencyConditions": [
+												"Failed"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "lastActivityFailure",
+										"value": "dummy!"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "StoreAccessToken",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetSalesforceOauthToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "accessToken",
+							"value": {
+								"value": "@activity('GetSalesforceOauthToken').output.access_token",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "CheckIfPipelineRunIdOverridden",
+						"type": "IfCondition",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(equals(pipeline().parameters.pipelineRunId, null))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "UsePipelineRunId",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipelineRunId",
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "OverridePipelineRunId",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipelineRunId",
+										"value": {
+											"value": "@pipeline().parameters.pipelineRunId",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"pipelineRunId": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"accessToken": {
+						"type": "String"
+					},
+					"pipelineRunId": {
+						"type": "String"
+					},
+					"lastActivityFailure": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "adx"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SalesforceLogs')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('factoryId'), '/datasets/AzureDataExplorerTable2')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureFunction1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/RepairTable')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1448,451 +1893,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/RetryOnCapacityFailure')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline10')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "GetEventTypes",
-						"type": "GetMetadata",
-						"dependsOn": [
-							{
-								"activity": "LoopLogFiles",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataset": {
-								"referenceName": "SalesforceLogs",
-								"type": "DatasetReference",
-								"parameters": {
-									"path": {
-										"value": "@variables('pipelineRunId')",
-										"type": "Expression"
-									}
-								}
-							},
-							"fieldList": [
-								"childItems"
-							],
-							"storeSettings": {
-								"type": "AzureBlobStorageReadSettings",
-								"recursive": true,
-								"enablePartitionDiscovery": false
-							},
-							"formatSettings": {
-								"type": "DelimitedTextReadSettings"
-							}
-						}
-					},
-					{
-						"name": "ForEach1",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GetEventTypes",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GetEventTypes').output.childItems",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "IngestLogFileToADX",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DelimitedTextSource",
-											"storeSettings": {
-												"type": "AzureBlobStorageReadSettings",
-												"recursive": true,
-												"wildcardFileName": "*",
-												"enablePartitionDiscovery": false
-											},
-											"formatSettings": {
-												"type": "DelimitedTextReadSettings"
-											}
-										},
-										"sink": {
-											"type": "AzureDataExplorerSink"
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "SalesforceLogs",
-											"type": "DatasetReference",
-											"parameters": {
-												"path": {
-													"value": "@concat(variables('pipelineRunId'), '/', item().name)",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "AzureDataExplorerTable2",
-											"type": "DatasetReference",
-											"parameters": {
-												"table": {
-													"value": "@item().name",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					},
-					{
-						"name": "GetSalesforceOauthToken",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "GetOAuthClientId",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "GetOAuthClientSecret",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": true,
-							"secureInput": true
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"method": "GET",
-							"headers": {},
-							"url": {
-								"value": "@concat('https://cona.my.salesforce.com/services/oauth2/token?client_id=', activity('GetOAuthClientId').output.value, '&client_secret=', activity('GetOAuthClientSecret').output.value, '&grant_type=client_credentials')",
-								"type": "Expression"
-							},
-							"connectVia": {
-								"referenceName": "AutoResolveIntegrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							}
-						}
-					},
-					{
-						"name": "GetOAuthClientId",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "CheckIfPipelineRunIdOverridden",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": true,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"method": "GET",
-							"headers": {},
-							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-id/d32e42f38db041e7a89b554323d29db5?api-version=7.0",
-							"connectVia": {
-								"referenceName": "AutoResolveIntegrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://vault.azure.net"
-							}
-						}
-					},
-					{
-						"name": "GetOAuthClientSecret",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "CheckIfPipelineRunIdOverridden",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": true,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"method": "GET",
-							"headers": {},
-							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-secret/96f223c734a7495db679b9624744ba4e?api-version=7.0",
-							"connectVia": {
-								"referenceName": "AutoResolveIntegrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							},
-							"authentication": {
-								"type": "MSI",
-								"resource": "https://vault.azure.net"
-							}
-						}
-					},
-					{
-						"name": "GetListOfLogFiles",
-						"type": "WebActivity",
-						"dependsOn": [
-							{
-								"activity": "StoreAccessToken",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": true
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"method": "GET",
-							"headers": {
-								"Authorization": {
-									"value": "@concat('Bearer ', variables('accessToken'))",
-									"type": "Expression"
-								}
-							},
-							"url": "https://cona.my.salesforce.com/services/data/v62.0/query?q=SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(+'API'+,+'ApexCallout'+,+'ApexExecution'+,+'ApexRestApi'+,+'ApexSoap'+,+'ApexTrigger'+,+'ApexUnexpectedException'+,+'ApiTotalUsage'+,+'BulkApi'+,+'BulkApiRequest'+,+'BulkApi2'+,+'ConcurrentLongRunningApexLimit'+,+'FlowExecution'+,+'Login'+,+'LoginAs'+,+'QueuedExecution'+,+'RestApi'++)+and+interval+=+'Hourly'",
-							"connectVia": {
-								"referenceName": "AutoResolveIntegrationRuntime",
-								"type": "IntegrationRuntimeReference"
-							}
-						}
-					},
-					{
-						"name": "LoopLogFiles",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "GetListOfLogFiles",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@activity('GetListOfLogFiles').output.records",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "PullLogFileToBlobStorage",
-									"type": "AzureFunctionActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"functionName": "process_salesforce_logs",
-										"body": {
-											"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com', item().LogFile, '\",', '\"accessToken\": \"', base64(variables('accessToken')), '\",', '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce/', variables('pipelineRunId'), '/', item().EventType, '\"}')",
-											"type": "Expression"
-										},
-										"headers": {},
-										"method": "POST"
-									},
-									"linkedServiceName": {
-										"referenceName": "AzureFunction1",
-										"type": "LinkedServiceReference"
-									}
-								},
-								{
-									"name": "DummySetOnFailure",
-									"type": "SetVariable",
-									"dependsOn": [
-										{
-											"activity": "PullLogFileToBlobStorage",
-											"dependencyConditions": [
-												"Failed"
-											]
-										}
-									],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "lastActivityFailure",
-										"value": "dummy!"
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "StoreAccessToken",
-						"type": "SetVariable",
-						"dependsOn": [
-							{
-								"activity": "GetSalesforceOauthToken",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"policy": {
-							"secureOutput": true,
-							"secureInput": true
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"variableName": "accessToken",
-							"value": {
-								"value": "@activity('GetSalesforceOauthToken').output.access_token",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "CheckIfPipelineRunIdOverridden",
-						"type": "IfCondition",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.pipelineRunId, null))",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "UsePipelineRunId",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "pipelineRunId",
-										"value": {
-											"value": "@pipeline().RunId",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "OverridePipelineRunId",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "pipelineRunId",
-										"value": {
-											"value": "@pipeline().parameters.pipelineRunId",
-											"type": "Expression"
-										}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"pipelineRunId": {
-						"type": "string"
-					}
-				},
-				"variables": {
-					"accessToken": {
-						"type": "String"
-					},
-					"pipelineRunId": {
-						"type": "String"
-					},
-					"lastActivityFailure": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "adx"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/SalesforceLogs')]",
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
-				"[concat(variables('factoryId'), '/datasets/AzureDataExplorerTable2')]",
-				"[concat(variables('factoryId'), '/linkedServices/AzureFunction1')]"
 			]
 		},
 		{
