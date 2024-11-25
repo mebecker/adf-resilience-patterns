@@ -315,6 +315,9 @@
 			},
 			"BearerToken": {
 				"type": "String"
+			},
+			"accessToken": {
+				"type": "String"
 			}
 		},
 		"folder": {
