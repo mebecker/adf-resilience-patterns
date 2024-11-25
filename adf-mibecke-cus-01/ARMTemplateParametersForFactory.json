@@ -5,14 +5,44 @@
 		"factoryName": {
 			"value": "adf-mibecke-cus-01"
 		},
+		"AzureFunction1_functionKey": {
+			"value": ""
+		},
+		"Salesforce Data API_clientSecret": {
+			"value": ""
+		},
+		"Salesforce1_clientSecret": {
+			"value": ""
+		},
 		"AzureDataExplorer1_properties_typeProperties_endpoint": {
 			"value": "https://adx-mibecke-01.centralus.kusto.windows.net"
 		},
 		"AzureDataExplorer1_properties_typeProperties_database": {
-			"value": "db1"
+			"value": "cona-salesforce-logs"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://samibeckecus01.dfs.core.windows.net/"
+		},
+		"AzureFunction1_properties_typeProperties_functionAppUrl": {
+			"value": "https://conafunc001.azurewebsites.net"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"value": "https://kv-mibecke-shared.vault.azure.net/"
+		},
+		"HttpServer1_properties_typeProperties_url": {
+			"value": "https://cona.my.salesforce.com/services/data"
+		},
+		"Salesforce Data API_properties_typeProperties_url": {
+			"value": "https://cona.my.salesforce.com/services/data/"
+		},
+		"Salesforce Data API_properties_typeProperties_clientId": {
+			"value": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI"
+		},
+		"Salesforce1_properties_typeProperties_environmentUrl": {
+			"value": "https://cona.my.salesforce.com"
+		},
+		"Salesforce1_properties_typeProperties_clientId": {
+			"value": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI"
 		},
 		"loganalytics_properties_typeProperties_url": {
 			"value": "https://dce-ingestion-gczf.centralus-1.ingest.monitor.azure.com/dataCollectionRules/dcr-a3447c69e7ab4fbcb629745a2505606b/streams/Custom-SalesforceLogs_CL?api-version=2023-01-01"

@@ -7,17 +7,57 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-mibecke-cus-01"
 		},
+		"AzureFunction1_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'AzureFunction1'"
+		},
+		"Salesforce Data API_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Salesforce Data API'"
+		},
+		"Salesforce1_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Salesforce1'"
+		},
 		"AzureDataExplorer1_properties_typeProperties_endpoint": {
 			"type": "string",
 			"defaultValue": "https://adx-mibecke-01.centralus.kusto.windows.net"
 		},
 		"AzureDataExplorer1_properties_typeProperties_database": {
 			"type": "string",
-			"defaultValue": "db1"
+			"defaultValue": "cona-salesforce-logs"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://samibeckecus01.dfs.core.windows.net/"
+		},
+		"AzureFunction1_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://conafunc001.azurewebsites.net"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-mibecke-shared.vault.azure.net/"
+		},
+		"HttpServer1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com/services/data"
+		},
+		"Salesforce Data API_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com/services/data/"
+		},
+		"Salesforce Data API_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI"
+		},
+		"Salesforce1_properties_typeProperties_environmentUrl": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com"
+		},
+		"Salesforce1_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI"
 		},
 		"loganalytics_properties_typeProperties_url": {
 			"type": "string",
@@ -1407,6 +1447,375 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline10')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetEventTypes",
+						"type": "GetMetadata",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "LoopLogFiles",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "SalesforceLogs",
+								"type": "DatasetReference",
+								"parameters": {
+									"path": {
+										"value": "@concat('salesforce/', 'f4436ff3-dffe-4d12-aaae-d648a9b1df72')",
+										"type": "Expression"
+									}
+								}
+							},
+							"fieldList": [
+								"childItems"
+							],
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							},
+							"formatSettings": {
+								"type": "DelimitedTextReadSettings"
+							}
+						}
+					},
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "GetEventTypes",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetEventTypes').output.childItems",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy data1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "DelimitedTextSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"wildcardFileName": "*",
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "DelimitedTextReadSettings"
+											}
+										},
+										"sink": {
+											"type": "AzureDataExplorerSink"
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "SalesforceLogs",
+											"type": "DatasetReference",
+											"parameters": {
+												"path": {
+													"value": "@concat('salesforce/', 'f4436ff3-dffe-4d12-aaae-d648a9b1df72/',item().name)",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "AzureDataExplorerTable2",
+											"type": "DatasetReference",
+											"parameters": {
+												"table": {
+													"value": "@item().name",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "GetSalesforceOauthToken",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetOAuthClientId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "GetOAuthClientSecret",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": {
+								"value": "@concat('https://cona.my.salesforce.com/services/oauth2/token?client_id=', activity('GetOAuthClientId').output.value, '&client_secret=', activity('GetOAuthClientSecret').output.value, '&grant_type=client_credentials')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					},
+					{
+						"name": "GetOAuthClientId",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-id/d32e42f38db041e7a89b554323d29db5?api-version=7.0",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "GetOAuthClientSecret",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-secret/96f223c734a7495db679b9624744ba4e?api-version=7.0",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "GetListOfLogFiles",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "StoreAccessToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ', variables('accessToken'))",
+									"type": "Expression"
+								}
+							},
+							"url": "https://cona.my.salesforce.com/services/data/v62.0/query?q=SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(+'API'+,+'ApexCallout'+,+'ApexExecution'+,+'ApexRestApi'+,+'ApexSoap'+,+'ApexTrigger'+,+'ApexUnexpectedException'+,+'ApiTotalUsage'+,+'BulkApi'+,+'BulkApiRequest'+,+'BulkApi2'+,+'ConcurrentLongRunningApexLimit'+,+'FlowExecution'+,+'Login'+,+'LoginAs'+,+'QueuedExecution'+,+'RestApi'++)+and+interval+=+'Hourly'",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					},
+					{
+						"name": "LoopLogFiles",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "GetListOfLogFiles",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetListOfLogFiles').output.records",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Azure Function1",
+									"type": "AzureFunctionActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"functionName": "process_salesforce_logs",
+										"body": {
+											"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com', item().LogFile, '\",', '\"accessToken\": \"', base64(variables('accessToken')), '\",', '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce/', pipeline().RunId, '/', item().EventType, '\"}')",
+											"type": "Expression"
+										},
+										"headers": {},
+										"method": "POST"
+									},
+									"linkedServiceName": {
+										"referenceName": "AzureFunction1",
+										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Wait",
+									"type": "Wait",
+									"dependsOn": [
+										{
+											"activity": "Azure Function1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 5
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "StoreAccessToken",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetSalesforceOauthToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "accessToken",
+							"value": {
+								"value": "@activity('GetSalesforceOauthToken').output.access_token",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"accessToken": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "adx"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SalesforceLogs')]",
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]",
+				"[concat(variables('factoryId'), '/datasets/AzureDataExplorerTable2')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureFunction1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1829,6 +2238,332 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline8')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetSalesforceOauthToken",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetOAuthClientId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "GetOAuthClientSecret",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": {
+								"value": "@concat('https://cona.my.salesforce.com/services/oauth2/token?client_id=', activity('GetOAuthClientId').output.value, '&client_secret=', activity('GetOAuthClientSecret').output.value, '&grant_type=client_credentials')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					},
+					{
+						"name": "GetOAuthClientId",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-id/d32e42f38db041e7a89b554323d29db5?api-version=7.0",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "GetOAuthClientSecret",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-secret/96f223c734a7495db679b9624744ba4e?api-version=7.0",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "Set Bearer Token",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetSalesforceOauthToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "BearerToken",
+							"value": {
+								"value": "@concat('Bearer ', activity('GetSalesforceOauthToken').output.access_token)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetListOfLogFiles",
+						"type": "WebActivity",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Set Bearer Token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Authorization": {
+									"value": "@variables('BearerToken')",
+									"type": "Expression"
+								}
+							},
+							"url": "https://cona.my.salesforce.com/services/data/v62.0/query?q=SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(+'API'+,+'ApexCallout'+,+'ApexExecution'+,+'ApexRestApi'+,+'ApexSoap'+,+'ApexTrigger'+,+'ApexUnexpectedException'+,+'ApiTotalUsage'+,+'BulkApi'+,+'BulkApiRequest'+,+'BulkApi2'+,+'ConcurrentLongRunningApexLimit'+,+'FlowExecution'+,+'Login'+,+'LoginAs'+,+'QueuedExecution'+,+'RestApi'++)+and+interval+=+'Hourly'",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					},
+					{
+						"name": "LoopLogFiles",
+						"type": "ForEach",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "GetListOfLogFiles",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetListOfLogFiles').output.records",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "WriteLogFileToStorage",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "GetLogFile",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "PUT",
+										"headers": {
+											"x-ms-version": "2019-07-07",
+											"x-ms-blob-type": "BlockBlob",
+											"Authentication": "Managed Identity",
+											"ContentEncoding": "gzip",
+											"ContentType": "application/csv"
+										},
+										"url": {
+											"value": "@concat('https://samibeckecus01.blob.core.windows.net/data/salesforce/', item().EventType, '.csv?resource=file')",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"body": {
+											"value": "@activity('GetLogFile').output.Response",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://storage.azure.com"
+										}
+									}
+								},
+								{
+									"name": "GetLogFile",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"headers": {
+											"Authorization": {
+												"value": "@variables('BearerToken')",
+												"type": "Expression"
+											},
+											"Content-Type": "application/csv",
+											"Accept-Encoding": "gzip"
+										},
+										"url": {
+											"value": "@concat('https://cona.my.salesforce.com/',item().LogFile)",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GetLogFile_copy1",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Set Bearer Token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Authorization": {
+									"value": "@variables('BearerToken')",
+									"type": "Expression"
+								},
+								"Accept-Encoding": "gzip",
+								"Content-Type": "text/csv"
+							},
+							"url": {
+								"value": "@concat('https://cona.my.salesforce.com/','/services/data/v62.0/sobjects/EventLogFile/0AT7V00000C78PgWAJ/LogFile')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"urls": {
+						"type": "Array"
+					},
+					"url": {
+						"type": "String"
+					},
+					"url2": {
+						"type": "String"
+					},
+					"BearerToken": {
+						"type": "String"
+					},
+					"accessToken": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "adx"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/tryJobPoolThenFallbackOnOdcrInstancePool')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1999,6 +2734,304 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataExplorerTable2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataExplorer1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"table": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureDataExplorerTable",
+				"schema": [
+					{
+						"name": "EVENT_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "TIMESTAMP",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_ID",
+						"type": "string"
+					},
+					{
+						"name": "ORGANIZATION_ID",
+						"type": "string"
+					},
+					{
+						"name": "USER_ID",
+						"type": "string"
+					},
+					{
+						"name": "RUN_TIME",
+						"type": "string"
+					},
+					{
+						"name": "CPU_TIME",
+						"type": "string"
+					},
+					{
+						"name": "URI",
+						"type": "string"
+					},
+					{
+						"name": "SESSION_KEY",
+						"type": "string"
+					},
+					{
+						"name": "LOGIN_KEY",
+						"type": "string"
+					},
+					{
+						"name": "USER_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_STATUS",
+						"type": "string"
+					},
+					{
+						"name": "DB_TOTAL_TIME",
+						"type": "string"
+					},
+					{
+						"name": "METHOD",
+						"type": "string"
+					},
+					{
+						"name": "MEDIA_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "STATUS_CODE",
+						"type": "string"
+					},
+					{
+						"name": "USER_AGENT",
+						"type": "string"
+					},
+					{
+						"name": "ROWS_PROCESSED",
+						"type": "string"
+					},
+					{
+						"name": "NUMBER_FIELDS",
+						"type": "string"
+					},
+					{
+						"name": "DB_BLOCKS",
+						"type": "string"
+					},
+					{
+						"name": "DB_CPU_TIME",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_SIZE",
+						"type": "string"
+					},
+					{
+						"name": "RESPONSE_SIZE",
+						"type": "string"
+					},
+					{
+						"name": "ENTITY_NAME",
+						"type": "string"
+					},
+					{
+						"name": "CONNECTED_APP_ID",
+						"type": "string"
+					},
+					{
+						"name": "CLIENT_NAME",
+						"type": "string"
+					},
+					{
+						"name": "EXCEPTION_MESSAGE",
+						"type": "string"
+					},
+					{
+						"name": "TIMESTAMP_DERIVED",
+						"type": "string"
+					},
+					{
+						"name": "USER_ID_DERIVED",
+						"type": "string"
+					},
+					{
+						"name": "CLIENT_IP",
+						"type": "string"
+					},
+					{
+						"name": "URI_ID_DERIVED",
+						"type": "string"
+					}
+				],
+				"typeProperties": {
+					"table": {
+						"value": "@dataset().table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataExplorer1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataExplorerLogEntries')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataExplorer1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureDataExplorerTable",
+				"schema": [
+					{
+						"name": "EVENT_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "TIMESTAMP",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_ID",
+						"type": "string"
+					},
+					{
+						"name": "ORGANIZATION_ID",
+						"type": "string"
+					},
+					{
+						"name": "USER_ID",
+						"type": "string"
+					},
+					{
+						"name": "RUN_TIME",
+						"type": "string"
+					},
+					{
+						"name": "CPU_TIME",
+						"type": "string"
+					},
+					{
+						"name": "URI",
+						"type": "string"
+					},
+					{
+						"name": "SESSION_KEY",
+						"type": "string"
+					},
+					{
+						"name": "LOGIN_KEY",
+						"type": "string"
+					},
+					{
+						"name": "USER_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_STATUS",
+						"type": "string"
+					},
+					{
+						"name": "DB_TOTAL_TIME",
+						"type": "string"
+					},
+					{
+						"name": "METHOD",
+						"type": "string"
+					},
+					{
+						"name": "MEDIA_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "STATUS_CODE",
+						"type": "string"
+					},
+					{
+						"name": "USER_AGENT",
+						"type": "string"
+					},
+					{
+						"name": "ROWS_PROCESSED",
+						"type": "string"
+					},
+					{
+						"name": "NUMBER_FIELDS",
+						"type": "string"
+					},
+					{
+						"name": "DB_BLOCKS",
+						"type": "string"
+					},
+					{
+						"name": "DB_CPU_TIME",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_SIZE",
+						"type": "string"
+					},
+					{
+						"name": "RESPONSE_SIZE",
+						"type": "string"
+					},
+					{
+						"name": "ENTITY_NAME",
+						"type": "string"
+					},
+					{
+						"name": "CONNECTED_APP_ID",
+						"type": "string"
+					},
+					{
+						"name": "CLIENT_NAME",
+						"type": "string"
+					},
+					{
+						"name": "EXCEPTION_MESSAGE",
+						"type": "string"
+					},
+					{
+						"name": "TIMESTAMP_DERIVED",
+						"type": "string"
+					},
+					{
+						"name": "USER_ID_DERIVED",
+						"type": "string"
+					},
+					{
+						"name": "CLIENT_IP",
+						"type": "string"
+					},
+					{
+						"name": "URI_ID_DERIVED",
+						"type": "string"
+					}
+				],
+				"typeProperties": {
+					"table": "MyLogs"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataExplorer1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DelimitedText1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2071,6 +3104,97 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText4')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "salesforce",
+						"fileSystem": "data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText5')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "HttpServer1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "v62.0/sobjects/EventLogFile/0AT7V00000C784AWAR/LogFile"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/HttpServer1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Json1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2109,6 +3233,58 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Json2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "salesforce",
+						"fileSystem": "data"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LogFile')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Salesforce Data API",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"LogFilePath": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "@dataset().LogFilePath",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Salesforce Data API')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/RestResource1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -2124,6 +3300,225 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/loganalytics')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestResource2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Salesforce Data API",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": "v62.0/query?q=SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(+'API'+,+'ApexCallout'+,+'ApexExecution'+,+'ApexRestApi'+,+'ApexSoap'+,+'ApexTrigger'+,+'ApexUnexpectedException'+,+'ApiTotalUsage'+,+'BulkApi'+,+'BulkApiRequest'+,+'BulkApi2'+,+'ConcurrentLongRunningApexLimit'+,+'FlowExecution'+,+'Login'+,+'LoginAs'+,+'QueuedExecution'+,+'RestApi'++)+and+interval+=+'Hourly'"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Salesforce Data API')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/RestResource3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Salesforce Data API",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Salesforce Data API')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesforceLogs')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"path": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().path",
+							"type": "Expression"
+						},
+						"fileSystem": "data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "EVENT_TYPE",
+						"type": "String"
+					},
+					{
+						"name": "TIMESTAMP",
+						"type": "String"
+					},
+					{
+						"name": "REQUEST_ID",
+						"type": "String"
+					},
+					{
+						"name": "ORGANIZATION_ID",
+						"type": "String"
+					},
+					{
+						"name": "USER_ID",
+						"type": "String"
+					},
+					{
+						"name": "RUN_TIME",
+						"type": "String"
+					},
+					{
+						"name": "CPU_TIME",
+						"type": "String"
+					},
+					{
+						"name": "URI",
+						"type": "String"
+					},
+					{
+						"name": "SESSION_KEY",
+						"type": "String"
+					},
+					{
+						"name": "LOGIN_KEY",
+						"type": "String"
+					},
+					{
+						"name": "USER_TYPE",
+						"type": "String"
+					},
+					{
+						"name": "REQUEST_STATUS",
+						"type": "String"
+					},
+					{
+						"name": "DB_TOTAL_TIME",
+						"type": "String"
+					},
+					{
+						"name": "METHOD",
+						"type": "String"
+					},
+					{
+						"name": "MEDIA_TYPE",
+						"type": "String"
+					},
+					{
+						"name": "STATUS_CODE",
+						"type": "String"
+					},
+					{
+						"name": "USER_AGENT",
+						"type": "String"
+					},
+					{
+						"name": "ROWS_PROCESSED",
+						"type": "String"
+					},
+					{
+						"name": "NUMBER_FIELDS",
+						"type": "String"
+					},
+					{
+						"name": "DB_BLOCKS",
+						"type": "String"
+					},
+					{
+						"name": "DB_CPU_TIME",
+						"type": "String"
+					},
+					{
+						"name": "REQUEST_SIZE",
+						"type": "String"
+					},
+					{
+						"name": "RESPONSE_SIZE",
+						"type": "String"
+					},
+					{
+						"name": "ENTITY_NAME",
+						"type": "String"
+					},
+					{
+						"name": "CONNECTED_APP_ID",
+						"type": "String"
+					},
+					{
+						"name": "CLIENT_NAME",
+						"type": "String"
+					},
+					{
+						"name": "EXCEPTION_MESSAGE",
+						"type": "String"
+					},
+					{
+						"name": "TIMESTAMP_DERIVED",
+						"type": "String"
+					},
+					{
+						"name": "USER_ID_DERIVED",
+						"type": "String"
+					},
+					{
+						"name": "CLIENT_IP",
+						"type": "String"
+					},
+					{
+						"name": "URI_ID_DERIVED",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesforceObject1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Salesforce1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SalesforceV2Object",
+				"schema": [],
+				"typeProperties": {
+					"objectApiName": "EventLogFile"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Salesforce1')]"
 			]
 		},
 		{
@@ -2164,6 +3559,69 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-3001519857218975.15.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
+					"newClusterNodeType": "Standard_DS3_v2",
+					"newClusterNumOfWorker": "1",
+					"newClusterVersion": "15.4.x-scala2.12",
+					"clusterOption": "Fixed",
+					"newClusterInitScripts": []
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureFunction1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('AzureFunction1_properties_typeProperties_functionAppUrl')]",
+					"authentication": "Anonymous",
+					"functionKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureFunction1_functionKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DatabricksInstancePoolLinkedService')]",
@@ -2231,6 +3689,85 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/HttpServer1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"BearerToken": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('HttpServer1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Salesforce Data API')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Salesforce Data API_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('Salesforce Data API_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Salesforce Data API_clientSecret')]"
+					},
+					"tokenEndpoint": "https://cona.my.salesforce.com/services/oauth2/token"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Salesforce1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SalesforceV2",
+				"typeProperties": {
+					"environmentUrl": "[parameters('Salesforce1_properties_typeProperties_environmentUrl')]",
+					"clientId": "[parameters('Salesforce1_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Salesforce1_clientSecret')]"
+					},
+					"apiVersion": "62.0",
+					"authenticationType": "OAuth2ClientCredential"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/loganalytics')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -2275,6 +3812,125 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SalesforceLogs",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "AzureDataExplorerTable2",
+								"type": "DatasetReference"
+							},
+							"name": "sink2"
+						}
+					],
+					"transformations": [],
+					"scriptLines": [
+						"source(output(",
+						"          EVENT_TYPE as string,",
+						"          TIMESTAMP as string,",
+						"          REQUEST_ID as string,",
+						"          ORGANIZATION_ID as string,",
+						"          USER_ID as string,",
+						"          RUN_TIME as string,",
+						"          CPU_TIME as string,",
+						"          URI as string,",
+						"          SESSION_KEY as string,",
+						"          LOGIN_KEY as string,",
+						"          USER_TYPE as string,",
+						"          REQUEST_STATUS as string,",
+						"          DB_TOTAL_TIME as string,",
+						"          METHOD as string,",
+						"          MEDIA_TYPE as string,",
+						"          STATUS_CODE as string,",
+						"          USER_AGENT as string,",
+						"          ROWS_PROCESSED as string,",
+						"          NUMBER_FIELDS as string,",
+						"          DB_BLOCKS as string,",
+						"          DB_CPU_TIME as string,",
+						"          REQUEST_SIZE as string,",
+						"          RESPONSE_SIZE as string,",
+						"          ENTITY_NAME as string,",
+						"          CONNECTED_APP_ID as string,",
+						"          CLIENT_NAME as string,",
+						"          EXCEPTION_MESSAGE as string,",
+						"          TIMESTAMP_DERIVED as string,",
+						"          USER_ID_DERIVED as string,",
+						"          CLIENT_IP as string,",
+						"          URI_ID_DERIVED as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> source1",
+						"source1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          EVENT_TYPE as string,",
+						"          TIMESTAMP as string,",
+						"          REQUEST_ID as string,",
+						"          ORGANIZATION_ID as string,",
+						"          USER_ID as string,",
+						"          RUN_TIME as string,",
+						"          CPU_TIME as string,",
+						"          URI as string,",
+						"          SESSION_KEY as string,",
+						"          LOGIN_KEY as string,",
+						"          USER_TYPE as string,",
+						"          REQUEST_STATUS as string,",
+						"          DB_TOTAL_TIME as string,",
+						"          METHOD as string,",
+						"          MEDIA_TYPE as string,",
+						"          STATUS_CODE as string,",
+						"          USER_AGENT as string,",
+						"          ROWS_PROCESSED as string,",
+						"          NUMBER_FIELDS as string,",
+						"          DB_BLOCKS as string,",
+						"          DB_CPU_TIME as string,",
+						"          REQUEST_SIZE as string,",
+						"          RESPONSE_SIZE as string,",
+						"          ENTITY_NAME as string,",
+						"          CONNECTED_APP_ID as string,",
+						"          CLIENT_NAME as string,",
+						"          EXCEPTION_MESSAGE as string,",
+						"          TIMESTAMP_DERIVED as string,",
+						"          USER_ID_DERIVED as string,",
+						"          CLIENT_IP as string,",
+						"          URI_ID_DERIVED as string",
+						"     ),",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> sink2"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SalesforceLogs')]",
+				"[concat(variables('factoryId'), '/datasets/AzureDataExplorerTable2')]"
 			]
 		},
 		{

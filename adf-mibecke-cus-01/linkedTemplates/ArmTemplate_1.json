@@ -6,12 +6,473 @@
 			"type": "string",
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-mibecke-cus-01"
+		},
+		"AzureFunction1_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'AzureFunction1'"
+		},
+		"Salesforce Data API_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Salesforce Data API'"
+		},
+		"Salesforce1_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Salesforce1'"
+		},
+		"AzureFunction1_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://conafunc001.azurewebsites.net"
+		},
+		"HttpServer1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com/services/data"
+		},
+		"Salesforce Data API_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com/services/data/"
+		},
+		"Salesforce Data API_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI"
+		},
+		"Salesforce1_properties_typeProperties_environmentUrl": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com"
+		},
+		"Salesforce1_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI"
+		},
+		"loganalytics_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dce-ingestion-gczf.centralus-1.ingest.monitor.azure.com/dataCollectionRules/dcr-a3447c69e7ab4fbcb629745a2505606b/streams/Custom-SalesforceLogs_CL?api-version=2023-01-01"
+		},
+		"loganalytics_properties_typeProperties_aadResourceId": {
+			"type": "string",
+			"defaultValue": "https://monitor.azure.com"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureFunction1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('AzureFunction1_properties_typeProperties_functionAppUrl')]",
+					"authentication": "Anonymous",
+					"functionKey": {
+						"type": "SecureString",
+						"value": "[parameters('AzureFunction1_functionKey')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DatabricksJobClusterLinkedService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"workspaceUrl": {
+						"type": "string"
+					},
+					"workspaceResourceId": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "@linkedService().workspaceUrl",
+					"authentication": "MSI",
+					"workspaceResourceId": "@linkedService().workspaceResourceId",
+					"newClusterNodeType": "Standard_E80ids_v4",
+					"newClusterNumOfWorker": "1",
+					"newClusterVersion": "15.4.x-scala2.12",
+					"clusterOption": "Fixed",
+					"newClusterInitScripts": []
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/HttpServer1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"BearerToken": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('HttpServer1_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Salesforce Data API')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Salesforce Data API_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "OAuth2ClientCredential",
+					"clientId": "[parameters('Salesforce Data API_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Salesforce Data API_clientSecret')]"
+					},
+					"tokenEndpoint": "https://cona.my.salesforce.com/services/oauth2/token"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Salesforce1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SalesforceV2",
+				"typeProperties": {
+					"environmentUrl": "[parameters('Salesforce1_properties_typeProperties_environmentUrl')]",
+					"clientId": "[parameters('Salesforce1_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "SecureString",
+						"value": "[parameters('Salesforce1_clientSecret')]"
+					},
+					"apiVersion": "62.0",
+					"authenticationType": "OAuth2ClientCredential"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/loganalytics')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('loganalytics_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "ManagedServiceIdentity",
+					"aadResourceId": "[parameters('loganalytics_properties_typeProperties_aadResourceId')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SwitchLinkedServiceOnCapacityFailure')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "InitialNotebookRunAttempt",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": {
+								"value": "@pipeline().parameters.notebookPath",
+								"type": "Expression"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "DatabricksJobClusterLinkedService",
+							"type": "LinkedServiceReference",
+							"parameters": {
+								"workspaceUrl": {
+									"value": "@pipeline().parameters.workspaceUrl",
+									"type": "Expression"
+								},
+								"workspaceResourceId": {
+									"value": "@pipeline().parameters.workspaceResourceId",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "CheckAcceptableErrorStrings",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "InitialNotebookRunAttempt",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.acceptedErrorMessages",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Check if failure capacity related",
+									"type": "IfCondition",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@contains(activity('InitialNotebookRunAttempt').output.runError, item())",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "FailoverNotebookRunAttempt",
+												"type": "DatabricksNotebook",
+												"dependsOn": [],
+												"policy": {
+													"timeout": "0.12:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"notebookPath": {
+														"value": "@pipeline().parameters.notebookPath",
+														"type": "Expression"
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "DatabricksInstancePoolLinkedService",
+													"type": "LinkedServiceReference",
+													"parameters": {
+														"workspaceUrl": {
+															"value": "@pipeline().parameters.workspaceUrl",
+															"type": "Expression"
+														},
+														"instancePoolId": {
+															"value": "@pipeline().parameters.instancePoolId",
+															"type": "Expression"
+														},
+														"workspaceResourceId": {
+															"value": "@pipeline().parameters.workspaceResourceId",
+															"type": "Expression"
+														}
+													}
+												}
+											},
+											{
+												"name": "setFailoverConditionSatisfied",
+												"type": "SetVariable",
+												"dependsOn": [],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "failoverConditionSatisfied",
+													"value": true
+												}
+											}
+										]
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "FailIfFailoverDidntHappen",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "CheckAcceptableErrorStrings",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(variables('failoverConditionSatisfied'))",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Fail1",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": "ERROR_NOT_CAPACITY_RELATED",
+										"errorCode": "123"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"notebookPath": {
+						"type": "string"
+					},
+					"workspaceUrl": {
+						"type": "string"
+					},
+					"instancePoolId": {
+						"type": "string"
+					},
+					"workspaceResourceId": {
+						"type": "string"
+					},
+					"acceptedErrorMessages": {
+						"type": "array"
+					}
+				},
+				"variables": {
+					"exitLoop": {
+						"type": "Boolean",
+						"defaultValue": false
+					},
+					"iterationCount": {
+						"type": "String",
+						"defaultValue": "1"
+					},
+					"iterationCountInternal": {
+						"type": "String",
+						"defaultValue": "1"
+					},
+					"activeWorkspaceUrl": {
+						"type": "String"
+					},
+					"activeInstancePoolId": {
+						"type": "String"
+					},
+					"failoverWorkpaceUrl": {
+						"type": "String"
+					},
+					"failoverInstancePoolId": {
+						"type": "String"
+					},
+					"activeWorkspaceResourceId": {
+						"type": "String"
+					},
+					"failoverWorkspaceResourceId": {
+						"type": "String"
+					},
+					"maxIterations": {
+						"type": "Integer",
+						"defaultValue": 2
+					},
+					"ErrorMessages": {
+						"type": "Array"
+					},
+					"FoundString": {
+						"type": "Boolean"
+					},
+					"failoverConditionSatisfied": {
+						"type": "Boolean"
+					}
+				},
+				"folder": {
+					"name": "Helpers"
+				},
+				"annotations": [],
+				"lastPublishTime": "2024-09-26T16:52:12Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/DatabricksJobClusterLinkedService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Execute Pipeline1",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "RepairTable",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"workspaceUrl": "https://adb-1386680983746450.10.azuredatabricks.net",
+								"tableName": "samibeckecus02.default.data3",
+								"warehouseId": "3fe3ae28df670188"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Old"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureDataExplorerTable1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
@@ -35,6 +496,300 @@
 				],
 				"typeProperties": {
 					"table": "people"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataExplorerTable2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataExplorer1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"table": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureDataExplorerTable",
+				"schema": [
+					{
+						"name": "EVENT_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "TIMESTAMP",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_ID",
+						"type": "string"
+					},
+					{
+						"name": "ORGANIZATION_ID",
+						"type": "string"
+					},
+					{
+						"name": "USER_ID",
+						"type": "string"
+					},
+					{
+						"name": "RUN_TIME",
+						"type": "string"
+					},
+					{
+						"name": "CPU_TIME",
+						"type": "string"
+					},
+					{
+						"name": "URI",
+						"type": "string"
+					},
+					{
+						"name": "SESSION_KEY",
+						"type": "string"
+					},
+					{
+						"name": "LOGIN_KEY",
+						"type": "string"
+					},
+					{
+						"name": "USER_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_STATUS",
+						"type": "string"
+					},
+					{
+						"name": "DB_TOTAL_TIME",
+						"type": "string"
+					},
+					{
+						"name": "METHOD",
+						"type": "string"
+					},
+					{
+						"name": "MEDIA_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "STATUS_CODE",
+						"type": "string"
+					},
+					{
+						"name": "USER_AGENT",
+						"type": "string"
+					},
+					{
+						"name": "ROWS_PROCESSED",
+						"type": "string"
+					},
+					{
+						"name": "NUMBER_FIELDS",
+						"type": "string"
+					},
+					{
+						"name": "DB_BLOCKS",
+						"type": "string"
+					},
+					{
+						"name": "DB_CPU_TIME",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_SIZE",
+						"type": "string"
+					},
+					{
+						"name": "RESPONSE_SIZE",
+						"type": "string"
+					},
+					{
+						"name": "ENTITY_NAME",
+						"type": "string"
+					},
+					{
+						"name": "CONNECTED_APP_ID",
+						"type": "string"
+					},
+					{
+						"name": "CLIENT_NAME",
+						"type": "string"
+					},
+					{
+						"name": "EXCEPTION_MESSAGE",
+						"type": "string"
+					},
+					{
+						"name": "TIMESTAMP_DERIVED",
+						"type": "string"
+					},
+					{
+						"name": "USER_ID_DERIVED",
+						"type": "string"
+					},
+					{
+						"name": "CLIENT_IP",
+						"type": "string"
+					},
+					{
+						"name": "URI_ID_DERIVED",
+						"type": "string"
+					}
+				],
+				"typeProperties": {
+					"table": {
+						"value": "@dataset().table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DataExplorerLogEntries')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataExplorer1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureDataExplorerTable",
+				"schema": [
+					{
+						"name": "EVENT_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "TIMESTAMP",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_ID",
+						"type": "string"
+					},
+					{
+						"name": "ORGANIZATION_ID",
+						"type": "string"
+					},
+					{
+						"name": "USER_ID",
+						"type": "string"
+					},
+					{
+						"name": "RUN_TIME",
+						"type": "string"
+					},
+					{
+						"name": "CPU_TIME",
+						"type": "string"
+					},
+					{
+						"name": "URI",
+						"type": "string"
+					},
+					{
+						"name": "SESSION_KEY",
+						"type": "string"
+					},
+					{
+						"name": "LOGIN_KEY",
+						"type": "string"
+					},
+					{
+						"name": "USER_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_STATUS",
+						"type": "string"
+					},
+					{
+						"name": "DB_TOTAL_TIME",
+						"type": "string"
+					},
+					{
+						"name": "METHOD",
+						"type": "string"
+					},
+					{
+						"name": "MEDIA_TYPE",
+						"type": "string"
+					},
+					{
+						"name": "STATUS_CODE",
+						"type": "string"
+					},
+					{
+						"name": "USER_AGENT",
+						"type": "string"
+					},
+					{
+						"name": "ROWS_PROCESSED",
+						"type": "string"
+					},
+					{
+						"name": "NUMBER_FIELDS",
+						"type": "string"
+					},
+					{
+						"name": "DB_BLOCKS",
+						"type": "string"
+					},
+					{
+						"name": "DB_CPU_TIME",
+						"type": "string"
+					},
+					{
+						"name": "REQUEST_SIZE",
+						"type": "string"
+					},
+					{
+						"name": "RESPONSE_SIZE",
+						"type": "string"
+					},
+					{
+						"name": "ENTITY_NAME",
+						"type": "string"
+					},
+					{
+						"name": "CONNECTED_APP_ID",
+						"type": "string"
+					},
+					{
+						"name": "CLIENT_NAME",
+						"type": "string"
+					},
+					{
+						"name": "EXCEPTION_MESSAGE",
+						"type": "string"
+					},
+					{
+						"name": "TIMESTAMP_DERIVED",
+						"type": "string"
+					},
+					{
+						"name": "USER_ID_DERIVED",
+						"type": "string"
+					},
+					{
+						"name": "CLIENT_IP",
+						"type": "string"
+					},
+					{
+						"name": "URI_ID_DERIVED",
+						"type": "string"
+					}
+				],
+				"typeProperties": {
+					"table": "MyLogs"
 				}
 			},
 			"dependsOn": []
@@ -108,6 +863,93 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText3')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "id",
+						"type": "String"
+					},
+					{
+						"name": "name",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText4')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "salesforce",
+						"fileSystem": "data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DelimitedText5')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "HttpServer1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": "v62.0/sobjects/EventLogFile/0AT7V00000C784AWAR/LogFile"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/HttpServer1')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Json1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -144,6 +986,56 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Json2')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage1",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "salesforce",
+						"fileSystem": "data"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LogFile')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Salesforce Data API",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"LogFilePath": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "@dataset().LogFilePath",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Salesforce Data API')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/RestResource1')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -157,255 +1049,9 @@
 				"typeProperties": {},
 				"schema": []
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline6')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "DelimitedTextSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "DelimitedTextReadSettings"
-								}
-							},
-							"sink": {
-								"type": "AzureDataExplorerSink"
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"name": "id",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "id",
-											"type": "Int32",
-											"physicalType": "int"
-										}
-									},
-									{
-										"source": {
-											"name": "name",
-											"type": "String",
-											"physicalType": "String"
-										},
-										"sink": {
-											"name": "name",
-											"type": "String",
-											"physicalType": "string"
-										}
-									}
-								],
-								"typeConversion": true,
-								"typeConversionSettings": {
-									"allowDataTruncation": true,
-									"treatBooleanAsNumber": false
-								}
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "DelimitedText1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "AzureDataExplorerTable1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "adx"
-				},
-				"annotations": []
-			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/DelimitedText1')]",
-				"[concat(variables('factoryId'), '/datasets/AzureDataExplorerTable1')]"
+				"[concat(variables('factoryId'), '/linkedServices/loganalytics')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline7')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Copy data1",
-						"type": "Copy",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "JsonSource",
-								"storeSettings": {
-									"type": "AzureBlobFSReadSettings",
-									"recursive": true,
-									"enablePartitionDiscovery": false
-								},
-								"formatSettings": {
-									"type": "JsonReadSettings"
-								}
-							},
-							"sink": {
-								"type": "RestSink",
-								"httpRequestTimeout": "00:05:00",
-								"requestInterval": 10,
-								"requestMethod": "POST",
-								"writeBatchSize": 10000,
-								"httpCompressionType": "none"
-							},
-							"enableStaging": false,
-							"translator": {
-								"type": "TabularTranslator",
-								"mappings": [
-									{
-										"source": {
-											"path": "$['timestamp']"
-										},
-										"sink": {
-											"path": "$['timestamp']"
-										}
-									},
-									{
-										"source": {
-											"path": "$['logEntry']"
-										},
-										"sink": {
-											"path": "$['logEntry']"
-										}
-									},
-									{
-										"source": {
-											"path": "$['AdditionalContext']"
-										},
-										"sink": {
-											"path": "$['AdditionalContext']"
-										}
-									}
-								]
-							}
-						},
-						"inputs": [
-							{
-								"referenceName": "Json1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						],
-						"outputs": [
-							{
-								"referenceName": "RestResource1",
-								"type": "DatasetReference",
-								"parameters": {}
-							}
-						]
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "adx"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Json1')]",
-				"[concat(variables('factoryId'), '/datasets/RestResource1')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/tryJobPoolThenFallbackOnOdcrInstancePool')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Execute Pipeline1",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "SwitchLinkedServiceOnCapacityFailure",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"notebookPath": "/Workspace/Users/admin@mngenvmcap469791.onmicrosoft.com/job1",
-								"workspaceUrl": "https://adb-3001519857218975.15.azuredatabricks.net/",
-								"instancePoolId": "1105-210744-foray3-pool-306c6t24",
-								"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
-								"acceptedErrorMessages": {
-									"value": "@pipeline().parameters.acceptedErrorMessages",
-									"type": "Expression"
-								}
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"acceptedErrorMessages": {
-						"type": "string",
-						"defaultValue": [
-							"AZURE_QUOTA_EXCEEDED_EXCEPTION",
-							"INSTANCE_POOL_MAX_CAPACITY_REACHED"
-						]
-					}
-				},
-				"folder": {
-					"name": "ODCR Demo"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
 		}
 	]
 }

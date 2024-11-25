@@ -35,6 +35,10 @@
 			"type": "string",
 			"defaultValue": "https://adb-3001519857218975.15.azuredatabricks.net/"
 		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-mibecke-shared.vault.azure.net/"
+		},
 		"AzureSynapseAnalytics432_properties_privateLinkResourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-synapse/providers/Microsoft.Synapse/workspaces/syn-mibecke-cus-01"
@@ -55,19 +59,11 @@
 		},
 		"AzureDataExplorer1_properties_typeProperties_database": {
 			"type": "string",
-			"defaultValue": "db1"
+			"defaultValue": "cona-salesforce-logs"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://samibeckecus01.dfs.core.windows.net/"
-		},
-		"loganalytics_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://dce-ingestion-gczf.centralus-1.ingest.monitor.azure.com/dataCollectionRules/dcr-a3447c69e7ab4fbcb629745a2505606b/streams/Custom-SalesforceLogs_CL?api-version=2023-01-01"
-		},
-		"loganalytics_properties_typeProperties_aadResourceId": {
-			"type": "string",
-			"defaultValue": "https://monitor.azure.com"
 		}
 	},
 	"variables": {
@@ -183,6 +179,19 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureKeyVault1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DatabricksInstancePoolLinkedService')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -210,6 +219,16 @@
 					"newClusterInitScripts": [],
 					"clusterOption": "Fixed"
 				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
 			},
 			"dependsOn": []
 		},
@@ -1472,6 +1491,332 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pipeline8')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "GetSalesforceOauthToken",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "GetOAuthClientId",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "GetOAuthClientSecret",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": {
+								"value": "@concat('https://cona.my.salesforce.com/services/oauth2/token?client_id=', activity('GetOAuthClientId').output.value, '&client_secret=', activity('GetOAuthClientSecret').output.value, '&grant_type=client_credentials')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					},
+					{
+						"name": "GetOAuthClientId",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-id/d32e42f38db041e7a89b554323d29db5?api-version=7.0",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "GetOAuthClientSecret",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://kv-mibecke-shared.vault.azure.net/secrets/cona-salesforce-client-secret/96f223c734a7495db679b9624744ba4e?api-version=7.0",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "Set Bearer Token",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "GetSalesforceOauthToken",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "BearerToken",
+							"value": {
+								"value": "@concat('Bearer ', activity('GetSalesforceOauthToken').output.access_token)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "GetListOfLogFiles",
+						"type": "WebActivity",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "Set Bearer Token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Authorization": {
+									"value": "@variables('BearerToken')",
+									"type": "Expression"
+								}
+							},
+							"url": "https://cona.my.salesforce.com/services/data/v62.0/query?q=SELECT+Id,+EventType,+LogFile,+LogDate,+LogFileLength+FROM+EventLogFile+WHERE+CreatedDate+>+Yesterday+AND+EventType+in+(+'API'+,+'ApexCallout'+,+'ApexExecution'+,+'ApexRestApi'+,+'ApexSoap'+,+'ApexTrigger'+,+'ApexUnexpectedException'+,+'ApiTotalUsage'+,+'BulkApi'+,+'BulkApiRequest'+,+'BulkApi2'+,+'ConcurrentLongRunningApexLimit'+,+'FlowExecution'+,+'Login'+,+'LoginAs'+,+'QueuedExecution'+,+'RestApi'++)+and+interval+=+'Hourly'",
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					},
+					{
+						"name": "LoopLogFiles",
+						"type": "ForEach",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
+						"dependsOn": [
+							{
+								"activity": "GetListOfLogFiles",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('GetListOfLogFiles').output.records",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "WriteLogFileToStorage",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "GetLogFile",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "PUT",
+										"headers": {
+											"x-ms-version": "2019-07-07",
+											"x-ms-blob-type": "BlockBlob",
+											"Authentication": "Managed Identity",
+											"ContentEncoding": "gzip",
+											"ContentType": "application/csv"
+										},
+										"url": {
+											"value": "@concat('https://samibeckecus01.blob.core.windows.net/data/salesforce/', item().EventType, '.csv?resource=file')",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										},
+										"body": {
+											"value": "@activity('GetLogFile').output.Response",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://storage.azure.com"
+										}
+									}
+								},
+								{
+									"name": "GetLogFile",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"headers": {
+											"Authorization": {
+												"value": "@variables('BearerToken')",
+												"type": "Expression"
+											},
+											"Content-Type": "application/csv",
+											"Accept-Encoding": "gzip"
+										},
+										"url": {
+											"value": "@concat('https://cona.my.salesforce.com/',item().LogFile)",
+											"type": "Expression"
+										},
+										"connectVia": {
+											"referenceName": "AutoResolveIntegrationRuntime",
+											"type": "IntegrationRuntimeReference"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "GetLogFile_copy1",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Set Bearer Token",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Authorization": {
+									"value": "@variables('BearerToken')",
+									"type": "Expression"
+								},
+								"Accept-Encoding": "gzip",
+								"Content-Type": "text/csv"
+							},
+							"url": {
+								"value": "@concat('https://cona.my.salesforce.com/','/services/data/v62.0/sobjects/EventLogFile/0AT7V00000C78PgWAJ/LogFile')",
+								"type": "Expression"
+							},
+							"connectVia": {
+								"referenceName": "AutoResolveIntegrationRuntime",
+								"type": "IntegrationRuntimeReference"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"urls": {
+						"type": "Array"
+					},
+					"url": {
+						"type": "String"
+					},
+					"url2": {
+						"type": "String"
+					},
+					"BearerToken": {
+						"type": "String"
+					},
+					"accessToken": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "adx"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/tryNonDdcrInstancePoolThenFallbackOnOdcrInstancePool')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -1598,25 +1943,17 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/DatabricksJobClusterLinkedService')]",
+			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"parameters": {
-					"workspaceUrl": {
-						"type": "string"
-					},
-					"workspaceResourceId": {
-						"type": "string"
-					}
-				},
 				"annotations": [],
 				"type": "AzureDatabricks",
 				"typeProperties": {
-					"domain": "@linkedService().workspaceUrl",
+					"domain": "https://adb-3001519857218975.15.azuredatabricks.net",
 					"authentication": "MSI",
-					"workspaceResourceId": "@linkedService().workspaceResourceId",
-					"newClusterNodeType": "Standard_E80ids_v4",
+					"workspaceResourceId": "/subscriptions/7a074df0-d2da-4def-92f3-cef1819caf9e/resourceGroups/rg-data/providers/Microsoft.Databricks/workspaces/adb-cus-01",
+					"newClusterNodeType": "Standard_DS3_v2",
 					"newClusterNumOfWorker": "1",
 					"newClusterVersion": "15.4.x-scala2.12",
 					"clusterOption": "Fixed",
@@ -1629,301 +1966,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/loganalytics')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "RestService",
-				"typeProperties": {
-					"url": "[parameters('loganalytics_properties_typeProperties_url')]",
-					"enableServerCertificateValidation": true,
-					"authenticationType": "ManagedServiceIdentity",
-					"aadResourceId": "[parameters('loganalytics_properties_typeProperties_aadResourceId')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SwitchLinkedServiceOnCapacityFailure')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "InitialNotebookRunAttempt",
-						"type": "DatabricksNotebook",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.12:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"notebookPath": {
-								"value": "@pipeline().parameters.notebookPath",
-								"type": "Expression"
-							}
-						},
-						"linkedServiceName": {
-							"referenceName": "DatabricksJobClusterLinkedService",
-							"type": "LinkedServiceReference",
-							"parameters": {
-								"workspaceUrl": {
-									"value": "@pipeline().parameters.workspaceUrl",
-									"type": "Expression"
-								},
-								"workspaceResourceId": {
-									"value": "@pipeline().parameters.workspaceResourceId",
-									"type": "Expression"
-								}
-							}
-						}
-					},
-					{
-						"name": "CheckAcceptableErrorStrings",
-						"type": "ForEach",
-						"dependsOn": [
-							{
-								"activity": "InitialNotebookRunAttempt",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"items": {
-								"value": "@pipeline().parameters.acceptedErrorMessages",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "Check if failure capacity related",
-									"type": "IfCondition",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@contains(activity('InitialNotebookRunAttempt').output.runError, item())",
-											"type": "Expression"
-										},
-										"ifTrueActivities": [
-											{
-												"name": "FailoverNotebookRunAttempt",
-												"type": "DatabricksNotebook",
-												"dependsOn": [],
-												"policy": {
-													"timeout": "0.12:00:00",
-													"retry": 0,
-													"retryIntervalInSeconds": 30,
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"notebookPath": {
-														"value": "@pipeline().parameters.notebookPath",
-														"type": "Expression"
-													}
-												},
-												"linkedServiceName": {
-													"referenceName": "DatabricksInstancePoolLinkedService",
-													"type": "LinkedServiceReference",
-													"parameters": {
-														"workspaceUrl": {
-															"value": "@pipeline().parameters.workspaceUrl",
-															"type": "Expression"
-														},
-														"instancePoolId": {
-															"value": "@pipeline().parameters.instancePoolId",
-															"type": "Expression"
-														},
-														"workspaceResourceId": {
-															"value": "@pipeline().parameters.workspaceResourceId",
-															"type": "Expression"
-														}
-													}
-												}
-											},
-											{
-												"name": "setFailoverConditionSatisfied",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "failoverConditionSatisfied",
-													"value": true
-												}
-											}
-										]
-									}
-								}
-							]
-						}
-					},
-					{
-						"name": "FailIfFailoverDidntHappen",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "CheckAcceptableErrorStrings",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(variables('failoverConditionSatisfied'))",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Fail1",
-									"type": "Fail",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"message": "ERROR_NOT_CAPACITY_RELATED",
-										"errorCode": "123"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"notebookPath": {
-						"type": "string"
-					},
-					"workspaceUrl": {
-						"type": "string"
-					},
-					"instancePoolId": {
-						"type": "string"
-					},
-					"workspaceResourceId": {
-						"type": "string"
-					},
-					"acceptedErrorMessages": {
-						"type": "array"
-					}
-				},
-				"variables": {
-					"exitLoop": {
-						"type": "Boolean",
-						"defaultValue": false
-					},
-					"iterationCount": {
-						"type": "String",
-						"defaultValue": "1"
-					},
-					"iterationCountInternal": {
-						"type": "String",
-						"defaultValue": "1"
-					},
-					"activeWorkspaceUrl": {
-						"type": "String"
-					},
-					"activeInstancePoolId": {
-						"type": "String"
-					},
-					"failoverWorkpaceUrl": {
-						"type": "String"
-					},
-					"failoverInstancePoolId": {
-						"type": "String"
-					},
-					"activeWorkspaceResourceId": {
-						"type": "String"
-					},
-					"failoverWorkspaceResourceId": {
-						"type": "String"
-					},
-					"maxIterations": {
-						"type": "Integer",
-						"defaultValue": 2
-					},
-					"ErrorMessages": {
-						"type": "Array"
-					},
-					"FoundString": {
-						"type": "Boolean"
-					},
-					"failoverConditionSatisfied": {
-						"type": "Boolean"
-					}
-				},
-				"folder": {
-					"name": "Helpers"
-				},
-				"annotations": [],
-				"lastPublishTime": "2024-09-26T16:52:12Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/DatabricksJobClusterLinkedService')]",
-				"[concat(variables('factoryId'), '/linkedServices/DatabricksInstancePoolLinkedService')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pipeline4')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Execute Pipeline1",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"policy": {
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "RepairTable",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {
-								"workspaceUrl": "https://adb-1386680983746450.10.azuredatabricks.net",
-								"tableName": "samibeckecus02.default.data3",
-								"warehouseId": "3fe3ae28df670188"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"folder": {
-					"name": "Old"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/RepairTable')]"
 			]
 		}
 	]

@@ -7,17 +7,57 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adf-mibecke-cus-01"
 		},
+		"AzureFunction1_functionKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'functionKey' of 'AzureFunction1'"
+		},
+		"Salesforce Data API_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Salesforce Data API'"
+		},
+		"Salesforce1_clientSecret": {
+			"type": "secureString",
+			"metadata": "Secure string for 'clientSecret' of 'Salesforce1'"
+		},
 		"AzureDataExplorer1_properties_typeProperties_endpoint": {
 			"type": "string",
 			"defaultValue": "https://adx-mibecke-01.centralus.kusto.windows.net"
 		},
 		"AzureDataExplorer1_properties_typeProperties_database": {
 			"type": "string",
-			"defaultValue": "db1"
+			"defaultValue": "cona-salesforce-logs"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://samibeckecus01.dfs.core.windows.net/"
+		},
+		"AzureFunction1_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://conafunc001.azurewebsites.net"
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://kv-mibecke-shared.vault.azure.net/"
+		},
+		"HttpServer1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com/services/data"
+		},
+		"Salesforce Data API_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com/services/data/"
+		},
+		"Salesforce Data API_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI"
+		},
+		"Salesforce1_properties_typeProperties_environmentUrl": {
+			"type": "string",
+			"defaultValue": "https://cona.my.salesforce.com"
+		},
+		"Salesforce1_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "3MVG9KsVczVNcM8wnLqsWomDZMgwL2Aenv7bVWIAMmyrKP.P5xCJ5cals7fK0IcwmyTGnuSuJSDyPTzghfAMI"
 		},
 		"loganalytics_properties_typeProperties_url": {
 			"type": "string",
@@ -117,6 +157,9 @@
 					"default_properties_workspaceUrl_value": {
 						"value": "[parameters('default_properties_workspaceUrl_value')]"
 					},
+					"AzureKeyVault1_properties_typeProperties_baseUrl": {
+						"value": "[parameters('AzureKeyVault1_properties_typeProperties_baseUrl')]"
+					},
 					"AzureSynapseAnalytics432_properties_privateLinkResourceId": {
 						"value": "[parameters('AzureSynapseAnalytics432_properties_privateLinkResourceId')]"
 					},
@@ -134,12 +177,6 @@
 					},
 					"AzureDataLakeStorage1_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
-					},
-					"loganalytics_properties_typeProperties_url": {
-						"value": "[parameters('loganalytics_properties_typeProperties_url')]"
-					},
-					"loganalytics_properties_typeProperties_aadResourceId": {
-						"value": "[parameters('loganalytics_properties_typeProperties_aadResourceId')]"
 					}
 				}
 			},
@@ -158,11 +195,64 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"AzureFunction1_functionKey": {
+						"value": "[parameters('AzureFunction1_functionKey')]"
+					},
+					"Salesforce Data API_clientSecret": {
+						"value": "[parameters('Salesforce Data API_clientSecret')]"
+					},
+					"Salesforce1_clientSecret": {
+						"value": "[parameters('Salesforce1_clientSecret')]"
+					},
+					"AzureFunction1_properties_typeProperties_functionAppUrl": {
+						"value": "[parameters('AzureFunction1_properties_typeProperties_functionAppUrl')]"
+					},
+					"HttpServer1_properties_typeProperties_url": {
+						"value": "[parameters('HttpServer1_properties_typeProperties_url')]"
+					},
+					"Salesforce Data API_properties_typeProperties_url": {
+						"value": "[parameters('Salesforce Data API_properties_typeProperties_url')]"
+					},
+					"Salesforce Data API_properties_typeProperties_clientId": {
+						"value": "[parameters('Salesforce Data API_properties_typeProperties_clientId')]"
+					},
+					"Salesforce1_properties_typeProperties_environmentUrl": {
+						"value": "[parameters('Salesforce1_properties_typeProperties_environmentUrl')]"
+					},
+					"Salesforce1_properties_typeProperties_clientId": {
+						"value": "[parameters('Salesforce1_properties_typeProperties_clientId')]"
+					},
+					"loganalytics_properties_typeProperties_url": {
+						"value": "[parameters('loganalytics_properties_typeProperties_url')]"
+					},
+					"loganalytics_properties_typeProperties_aadResourceId": {
+						"value": "[parameters('loganalytics_properties_typeProperties_aadResourceId')]"
 					}
 				}
 			},
 			"dependsOn": [
 				"[resourceId('Microsoft.Resources/deployments', 'adf-mibecke-cus-01_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "adf-mibecke-cus-01_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'adf-mibecke-cus-01_ArmTemplate_1')]"
 			]
 		}
 	]
