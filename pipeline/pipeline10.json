@@ -322,7 +322,11 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": []
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "lastActivityFailure",
+								"value": "dummy!"
+							}
 						}
 					]
 				}
@@ -412,6 +416,9 @@
 				"type": "String"
 			},
 			"pipelineRunId": {
+				"type": "String"
+			},
+			"lastActivityFailure": {
 				"type": "String"
 			}
 		},
