@@ -64,7 +64,7 @@
 					},
 					"activities": [
 						{
-							"name": "Copy data1",
+							"name": "IngestLogFileToADX",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -132,8 +132,6 @@
 			{
 				"name": "GetSalesforceOauthToken",
 				"type": "WebActivity",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetOAuthClientId",
@@ -173,7 +171,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "If Condition1",
+						"activity": "CheckIfPipelineRunIdOverridden",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -205,7 +203,7 @@
 				"type": "WebActivity",
 				"dependsOn": [
 					{
-						"activity": "If Condition1",
+						"activity": "CheckIfPipelineRunIdOverridden",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -235,8 +233,6 @@
 			{
 				"name": "GetListOfLogFiles",
 				"type": "WebActivity",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "StoreAccessToken",
@@ -271,8 +267,6 @@
 			{
 				"name": "LoopLogFiles",
 				"type": "ForEach",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetListOfLogFiles",
@@ -289,7 +283,7 @@
 					},
 					"activities": [
 						{
-							"name": "Azure Function1",
+							"name": "PullLogFileToBlobStorage",
 							"type": "AzureFunctionActivity",
 							"dependsOn": [],
 							"policy": {
@@ -318,7 +312,7 @@
 							"type": "Wait",
 							"dependsOn": [
 								{
-									"activity": "Azure Function1",
+									"activity": "PullLogFileToBlobStorage",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -335,8 +329,6 @@
 			{
 				"name": "StoreAccessToken",
 				"type": "SetVariable",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetSalesforceOauthToken",
@@ -359,7 +351,7 @@
 				}
 			},
 			{
-				"name": "If Condition1",
+				"name": "CheckIfPipelineRunIdOverridden",
 				"type": "IfCondition",
 				"dependsOn": [],
 				"userProperties": [],
@@ -370,7 +362,7 @@
 					},
 					"ifFalseActivities": [
 						{
-							"name": "Set variable2",
+							"name": "UsePipelineRunId",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
@@ -389,7 +381,7 @@
 					],
 					"ifTrueActivities": [
 						{
-							"name": "Set variable1",
+							"name": "OverridePipelineRunId",
 							"type": "SetVariable",
 							"dependsOn": [],
 							"policy": {
