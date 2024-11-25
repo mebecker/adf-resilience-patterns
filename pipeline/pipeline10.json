@@ -296,6 +296,22 @@
 								"referenceName": "AzureFunction1",
 								"type": "LinkedServiceReference"
 							}
+						},
+						{
+							"name": "Wait",
+							"type": "Wait",
+							"dependsOn": [
+								{
+									"activity": "Azure Function1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 5
+							}
 						}
 					]
 				}
