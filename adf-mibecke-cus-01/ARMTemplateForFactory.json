@@ -81,6 +81,10 @@
 				"syn-mibecke-cus-01.sql.azuresynapse.net"
 			]
 		},
+		"AzureBlobStorage1_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://rgconab540.blob.core.windows.net/"
+		},
 		"default_properties_primaryWorkspaceUrl_value": {
 			"type": "string",
 			"defaultValue": "https://adb-3001519857218975.15.azuredatabricks.net"
@@ -1455,8 +1459,6 @@
 					{
 						"name": "GetEventTypes",
 						"type": "GetMetadata",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "LoopLogFiles",
@@ -1479,7 +1481,7 @@
 								"type": "DatasetReference",
 								"parameters": {
 									"path": {
-										"value": "@concat('salesforce/', 'f4436ff3-dffe-4d12-aaae-d648a9b1df72')",
+										"value": "@variables('pipelineRunId')",
 										"type": "Expression"
 									}
 								}
@@ -1488,7 +1490,7 @@
 								"childItems"
 							],
 							"storeSettings": {
-								"type": "AzureBlobFSReadSettings",
+								"type": "AzureBlobStorageReadSettings",
 								"recursive": true,
 								"enablePartitionDiscovery": false
 							},
@@ -1500,8 +1502,6 @@
 					{
 						"name": "ForEach1",
 						"type": "ForEach",
-						"state": "Inactive",
-						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "GetEventTypes",
@@ -1518,7 +1518,7 @@
 							},
 							"activities": [
 								{
-									"name": "Copy data1",
+									"name": "IngestLogFileToADX",
 									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
@@ -1533,7 +1533,7 @@
 										"source": {
 											"type": "DelimitedTextSource",
 											"storeSettings": {
-												"type": "AzureBlobFSReadSettings",
+												"type": "AzureBlobStorageReadSettings",
 												"recursive": true,
 												"wildcardFileName": "*",
 												"enablePartitionDiscovery": false
@@ -1561,7 +1561,7 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"path": {
-													"value": "@concat('salesforce/', 'f4436ff3-dffe-4d12-aaae-d648a9b1df72/',item().name)",
+													"value": "@concat(variables('pipelineRunId'), '/', item().name)",
 													"type": "Expression"
 												}
 											}
@@ -1624,7 +1624,14 @@
 					{
 						"name": "GetOAuthClientId",
 						"type": "WebActivity",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "CheckIfPipelineRunIdOverridden",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -1650,7 +1657,14 @@
 					{
 						"name": "GetOAuthClientSecret",
 						"type": "WebActivity",
-						"dependsOn": [],
+						"dependsOn": [
+							{
+								"activity": "CheckIfPipelineRunIdOverridden",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
 						"policy": {
 							"timeout": "0.12:00:00",
 							"retry": 0,
@@ -1726,7 +1740,7 @@
 							},
 							"activities": [
 								{
-									"name": "Azure Function1",
+									"name": "PullLogFileToBlobStorage",
 									"type": "AzureFunctionActivity",
 									"dependsOn": [],
 									"policy": {
@@ -1740,7 +1754,7 @@
 									"typeProperties": {
 										"functionName": "process_salesforce_logs",
 										"body": {
-											"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com', item().LogFile, '\",', '\"accessToken\": \"', base64(variables('accessToken')), '\",', '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce/', pipeline().RunId, '/', item().EventType, '\"}')",
+											"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com', item().LogFile, '\",', '\"accessToken\": \"', base64(variables('accessToken')), '\",', '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce/', variables('pipelineRunId'), '/', item().EventType, '\"}')",
 											"type": "Expression"
 										},
 										"headers": {},
@@ -1756,7 +1770,7 @@
 									"type": "Wait",
 									"dependsOn": [
 										{
-											"activity": "Azure Function1",
+											"activity": "PullLogFileToBlobStorage",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -1793,13 +1807,71 @@
 								"type": "Expression"
 							}
 						}
+					},
+					{
+						"name": "CheckIfPipelineRunIdOverridden",
+						"type": "IfCondition",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(equals(pipeline().parameters.pipelineRunId, null))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "UsePipelineRunId",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipelineRunId",
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "OverridePipelineRunId",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipelineRunId",
+										"value": {
+											"value": "@pipeline().parameters.pipelineRunId",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
 					}
 				],
 				"policy": {
 					"elapsedTimeMetric": {}
 				},
+				"parameters": {
+					"pipelineRunId": {
+						"type": "string"
+					}
+				},
 				"variables": {
 					"accessToken": {
+						"type": "String"
+					},
+					"pipelineRunId": {
 						"type": "String"
 					}
 				},
@@ -3346,7 +3418,7 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage1",
+					"referenceName": "AzureBlobStorage1",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
@@ -3358,12 +3430,12 @@
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
-						"type": "AzureBlobFSLocation",
+						"type": "AzureBlobStorageLocation",
 						"folderPath": {
 							"value": "@dataset().path",
 							"type": "Expression"
 						},
-						"fileSystem": "data"
+						"container": "salesforce"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\"",
@@ -3498,7 +3570,7 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
@@ -3951,6 +4023,26 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/managedVirtualNetworks/default')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"serviceEndpoint": "[parameters('AzureBlobStorage1_properties_typeProperties_serviceEndpoint')]",
+					"accountKind": "StorageV2"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
 			]
 		},
 		{

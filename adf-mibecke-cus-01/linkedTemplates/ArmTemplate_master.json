@@ -81,6 +81,10 @@
 				"syn-mibecke-cus-01.sql.azuresynapse.net"
 			]
 		},
+		"AzureBlobStorage1_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://rgconab540.blob.core.windows.net/"
+		},
 		"default_properties_primaryWorkspaceUrl_value": {
 			"type": "string",
 			"defaultValue": "https://adb-3001519857218975.15.azuredatabricks.net"
@@ -228,6 +232,9 @@
 					},
 					"loganalytics_properties_typeProperties_aadResourceId": {
 						"value": "[parameters('loganalytics_properties_typeProperties_aadResourceId')]"
+					},
+					"AzureBlobStorage1_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('AzureBlobStorage1_properties_typeProperties_serviceEndpoint')]"
 					}
 				}
 			},
