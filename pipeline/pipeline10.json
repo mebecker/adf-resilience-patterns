@@ -27,7 +27,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"path": {
-								"value": "@concat('salesforce/', variables('pipelineRunId'))",
+								"value": "@variables('pipelineRunId')",
 								"type": "Expression"
 							}
 						}
@@ -132,6 +132,8 @@
 			{
 				"name": "GetSalesforceOauthToken",
 				"type": "WebActivity",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetOAuthClientId",
@@ -233,6 +235,8 @@
 			{
 				"name": "GetListOfLogFiles",
 				"type": "WebActivity",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "StoreAccessToken",
@@ -267,6 +271,8 @@
 			{
 				"name": "LoopLogFiles",
 				"type": "ForEach",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetListOfLogFiles",
@@ -329,6 +335,8 @@
 			{
 				"name": "StoreAccessToken",
 				"type": "SetVariable",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetSalesforceOauthToken",

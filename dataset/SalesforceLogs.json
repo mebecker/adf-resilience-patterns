@@ -19,7 +19,7 @@
 					"value": "@dataset().path",
 					"type": "Expression"
 				},
-				"fileSystem": "data"
+				"fileSystem": "salesforce"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\"",
