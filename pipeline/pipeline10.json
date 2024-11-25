@@ -107,7 +107,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"path": {
-											"value": "@concat(variables('pipelineRunId'), item().name)",
+											"value": "@concat(variables('pipelineRunId'), '/', item().name)",
 											"type": "Expression"
 										}
 									}
