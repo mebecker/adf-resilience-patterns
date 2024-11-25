@@ -1766,19 +1766,24 @@
 									}
 								},
 								{
-									"name": "Wait",
-									"type": "Wait",
+									"name": "DummySetOnFailure",
+									"type": "SetVariable",
 									"dependsOn": [
 										{
 											"activity": "PullLogFileToBlobStorage",
 											"dependencyConditions": [
-												"Succeeded"
+												"Failed"
 											]
 										}
 									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
 									"userProperties": [],
 									"typeProperties": {
-										"waitTimeInSeconds": 5
+										"variableName": "lastActivityFailure",
+										"value": "dummy!"
 									}
 								}
 							]
@@ -1872,6 +1877,9 @@
 						"type": "String"
 					},
 					"pipelineRunId": {
+						"type": "String"
+					},
+					"lastActivityFailure": {
 						"type": "String"
 					}
 				},
