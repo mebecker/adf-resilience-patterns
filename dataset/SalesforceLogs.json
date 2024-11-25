@@ -2,7 +2,7 @@
 	"name": "SalesforceLogs",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureDataLakeStorage1",
+			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
@@ -14,12 +14,12 @@
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
-				"type": "AzureBlobFSLocation",
+				"type": "AzureBlobStorageLocation",
 				"folderPath": {
 					"value": "@dataset().path",
 					"type": "Expression"
 				},
-				"fileSystem": "salesforce"
+				"container": "salesforce"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\"",
