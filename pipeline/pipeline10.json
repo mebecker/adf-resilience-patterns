@@ -308,20 +308,21 @@
 							}
 						},
 						{
-							"name": "Wait",
-							"type": "Wait",
+							"name": "DummySetOnFailure",
+							"type": "SetVariable",
 							"dependsOn": [
 								{
 									"activity": "PullLogFileToBlobStorage",
 									"dependencyConditions": [
-										"Succeeded"
+										"Failed"
 									]
 								}
 							],
-							"userProperties": [],
-							"typeProperties": {
-								"waitTimeInSeconds": 5
-							}
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": []
 						}
 					]
 				}
