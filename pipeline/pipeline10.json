@@ -5,8 +5,6 @@
 			{
 				"name": "GetEventTypes",
 				"type": "GetMetadata",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "LoopLogFiles",
@@ -29,7 +27,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"path": {
-								"value": "@concat('salesforce/', 'f4436ff3-dffe-4d12-aaae-d648a9b1df72')",
+								"value": "@concat('salesforce/', variables('pipelineRunId'))",
 								"type": "Expression"
 							}
 						}
@@ -50,8 +48,6 @@
 			{
 				"name": "ForEach1",
 				"type": "ForEach",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "GetEventTypes",
@@ -111,7 +107,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"path": {
-											"value": "@concat('salesforce/', 'f4436ff3-dffe-4d12-aaae-d648a9b1df72/',item().name)",
+											"value": "@concat('salesforce/', variables('pipelineRunId'), item().name)",
 											"type": "Expression"
 										}
 									}
@@ -173,7 +169,14 @@
 			{
 				"name": "GetOAuthClientId",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "If Condition1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -198,7 +201,14 @@
 			{
 				"name": "GetOAuthClientSecret",
 				"type": "WebActivity",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "If Condition1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -287,7 +297,7 @@
 							"typeProperties": {
 								"functionName": "process_salesforce_logs",
 								"body": {
-									"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com', item().LogFile, '\",', '\"accessToken\": \"', base64(variables('accessToken')), '\",', '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce/', pipeline().RunId, '/', item().EventType, '\"}')",
+									"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com', item().LogFile, '\",', '\"accessToken\": \"', base64(variables('accessToken')), '\",', '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce/', variables('pipelineRunId'), '/', item().EventType, '\"}')",
 									"type": "Expression"
 								},
 								"method": "POST"
@@ -339,10 +349,68 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(equals(pipeline().parameters.pipelineRunId, null))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Set variable2",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "pipelineRunId",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set variable1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "pipelineRunId",
+								"value": {
+									"value": "@pipeline().parameters.pipelineRunId",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
 			}
 		],
+		"parameters": {
+			"pipelineRunId": {
+				"type": "string"
+			}
+		},
 		"variables": {
 			"accessToken": {
+				"type": "String"
+			},
+			"pipelineRunId": {
 				"type": "String"
 			}
 		},
