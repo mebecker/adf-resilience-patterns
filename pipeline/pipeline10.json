@@ -369,7 +369,7 @@
 							"typeProperties": {
 								"functionName": "process_salesforce_logs",
 								"body": {
-									"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com/\"', item().LogFile, '\"accessToken\": ', base64(variables('accessToken')), '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce', pipeline().RunId, '/', item().EventType, '}')",
+									"value": "@concat('{\"logFileUrl\": \"https://cona.my.salesforce.com', item().LogFile, '\",', '\"accessToken\": \"', base64(variables('accessToken')), '\",', '\"storageAccountUrl\": \"https://rgconab540.blob.core.windows.net/salesforce/', pipeline().RunId, '/', item().EventType, '\"}')",
 									"type": "Expression"
 								},
 								"method": "POST"
