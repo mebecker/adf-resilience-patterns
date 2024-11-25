@@ -79,7 +79,7 @@
 								"source": {
 									"type": "DelimitedTextSource",
 									"storeSettings": {
-										"type": "AzureBlobFSReadSettings",
+										"type": "AzureBlobStorageReadSettings",
 										"recursive": true,
 										"wildcardFileName": "*",
 										"enablePartitionDiscovery": false
@@ -107,7 +107,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"path": {
-											"value": "@concat('salesforce/', variables('pipelineRunId'), item().name)",
+											"value": "@concat(variables('pipelineRunId'), item().name)",
 											"type": "Expression"
 										}
 									}
