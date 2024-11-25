@@ -14,6 +14,9 @@
 		"Salesforce1_clientSecret": {
 			"value": ""
 		},
+		"AzureBlobStorage1_properties_typeProperties_serviceEndpoint": {
+			"value": "https://rgconab540.blob.core.windows.net/"
+		},
 		"AzureDataExplorer1_properties_typeProperties_endpoint": {
 			"value": "https://adx-mibecke-01.centralus.kusto.windows.net"
 		},
@@ -60,9 +63,6 @@
 			"value": [
 				"syn-mibecke-cus-01.sql.azuresynapse.net"
 			]
-		},
-		"AzureBlobStorage1_properties_typeProperties_serviceEndpoint": {
-			"value": "https://rgconab540.blob.core.windows.net/"
 		},
 		"default_properties_primaryWorkspaceUrl_value": {
 			"value": "https://adb-3001519857218975.15.azuredatabricks.net"
