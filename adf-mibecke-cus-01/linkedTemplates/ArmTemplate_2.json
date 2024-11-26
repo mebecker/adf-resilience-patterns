@@ -88,6 +88,7 @@
 						"container": "salesforce"
 					},
 					"columnDelimiter": ",",
+					"compressionCodec": "gzip",
 					"escapeChar": "\"",
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
@@ -373,6 +374,56 @@
 						}
 					},
 					{
+						"name": "CheckIfPipelineRunIdOverridden",
+						"type": "IfCondition",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(equals(pipeline().parameters.pipelineRunId, null))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "UsePipelineRunId",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipelineRunId",
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "OverridePipelineRunId",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "pipelineRunId",
+										"value": {
+											"value": "@pipeline().parameters.pipelineRunId",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
 						"name": "GetSalesforceOauthToken",
 						"type": "WebActivity",
 						"dependsOn": [
@@ -600,56 +651,6 @@
 								"value": "@activity('GetSalesforceOauthToken').output.access_token",
 								"type": "Expression"
 							}
-						}
-					},
-					{
-						"name": "CheckIfPipelineRunIdOverridden",
-						"type": "IfCondition",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@not(equals(pipeline().parameters.pipelineRunId, null))",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "UsePipelineRunId",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "pipelineRunId",
-										"value": {
-											"value": "@pipeline().RunId",
-											"type": "Expression"
-										}
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "OverridePipelineRunId",
-									"type": "SetVariable",
-									"dependsOn": [],
-									"policy": {
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"variableName": "pipelineRunId",
-										"value": {
-											"value": "@pipeline().parameters.pipelineRunId",
-											"type": "Expression"
-										}
-									}
-								}
-							]
 						}
 					}
 				],

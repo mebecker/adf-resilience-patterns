@@ -21,7 +21,7 @@
 		},
 		"AzureFunction1_properties_typeProperties_functionAppUrl": {
 			"type": "string",
-			"defaultValue": "https://conafunc001.azurewebsites.net"
+			"defaultValue": "https://conafunc002.azurewebsites.net"
 		},
 		"HttpServer1_properties_typeProperties_url": {
 			"type": "string",

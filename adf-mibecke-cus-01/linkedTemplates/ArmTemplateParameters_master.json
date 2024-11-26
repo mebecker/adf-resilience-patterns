@@ -27,7 +27,7 @@
 			"value": "https://samibeckecus01.dfs.core.windows.net/"
 		},
 		"AzureFunction1_properties_typeProperties_functionAppUrl": {
-			"value": "https://conafunc001.azurewebsites.net"
+			"value": "https://conafunc002.azurewebsites.net"
 		},
 		"AzureKeyVault1_properties_typeProperties_baseUrl": {
 			"value": "https://kv-mibecke-shared.vault.azure.net/"
