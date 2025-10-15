@@ -1,0 +1,28 @@
+{
+	"name": "people_out",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataExplorer1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureDataExplorerTable",
+		"schema": [
+			{
+				"name": "Id",
+				"type": "int"
+			},
+			{
+				"name": "FirstName",
+				"type": "string"
+			},
+			{
+				"name": "LastName",
+				"type": "string"
+			}
+		],
+		"typeProperties": {
+			"table": "People"
+		}
+	}
+}
