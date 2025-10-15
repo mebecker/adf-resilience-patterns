@@ -5,7 +5,7 @@
 		"type": "AzureDataExplorer",
 		"typeProperties": {
 			"endpoint": "https://adx-mibecke-01.centralus.kusto.windows.net",
-			"database": "cona-salesforce-logs"
+			"database": "test"
 		},
 		"connectVia": {
 			"referenceName": "AutoResolveIntegrationRuntime",
