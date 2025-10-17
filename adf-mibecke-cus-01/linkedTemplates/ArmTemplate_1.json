@@ -19,6 +19,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'clientSecret' of 'Salesforce1'"
 		},
+		"AzureDataLakeStorage1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://samibeckecus01.dfs.core.windows.net/"
+		},
 		"AzureFunction1_properties_typeProperties_functionAppUrl": {
 			"type": "string",
 			"defaultValue": "https://conafunc002.azurewebsites.net"
@@ -56,6 +60,23 @@
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureDataLakeStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureDatabricks1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -852,7 +873,9 @@
 					}
 				]
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DelimitedText2')]",
@@ -884,7 +907,9 @@
 					}
 				]
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DelimitedText3')]",
@@ -918,7 +943,9 @@
 					}
 				]
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DelimitedText4')]",
@@ -944,7 +971,9 @@
 				},
 				"schema": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DelimitedText5')]",
@@ -1007,7 +1036,9 @@
 					}
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Json2')]",
@@ -1029,34 +1060,8 @@
 				},
 				"schema": {}
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/LogFile')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Salesforce Data API",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"LogFilePath": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"type": "RestResource",
-				"typeProperties": {
-					"relativeUrl": {
-						"value": "@dataset().LogFilePath",
-						"type": "Expression"
-					}
-				},
-				"schema": []
-			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Salesforce Data API')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage1')]"
 			]
 		}
 	]

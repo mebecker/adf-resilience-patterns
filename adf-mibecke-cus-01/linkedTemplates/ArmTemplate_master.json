@@ -29,7 +29,7 @@
 		},
 		"AzureDataExplorer1_properties_typeProperties_database": {
 			"type": "string",
-			"defaultValue": "cona-salesforce-logs"
+			"defaultValue": "test"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"type": "string",
@@ -181,9 +181,6 @@
 					},
 					"AzureDataExplorer1_properties_typeProperties_database": {
 						"value": "[parameters('AzureDataExplorer1_properties_typeProperties_database')]"
-					},
-					"AzureDataLakeStorage1_properties_typeProperties_url": {
-						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
 					}
 				}
 			},
@@ -211,6 +208,9 @@
 					},
 					"Salesforce1_clientSecret": {
 						"value": "[parameters('Salesforce1_clientSecret')]"
+					},
+					"AzureDataLakeStorage1_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorage1_properties_typeProperties_url')]"
 					},
 					"AzureFunction1_properties_typeProperties_functionAppUrl": {
 						"value": "[parameters('AzureFunction1_properties_typeProperties_functionAppUrl')]"

@@ -21,7 +21,7 @@
 			"value": "https://adx-mibecke-01.centralus.kusto.windows.net"
 		},
 		"AzureDataExplorer1_properties_typeProperties_database": {
-			"value": "cona-salesforce-logs"
+			"value": "test"
 		},
 		"AzureDataLakeStorage1_properties_typeProperties_url": {
 			"value": "https://samibeckecus01.dfs.core.windows.net/"
